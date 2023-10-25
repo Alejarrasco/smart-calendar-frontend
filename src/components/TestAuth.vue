@@ -1,5 +1,5 @@
 <template>
-    <button>Press Me</button>
+    <button @click="callapi()">Press Me</button>
 </template>
 
 <script>
@@ -21,6 +21,12 @@ export default {
                 console.log(await response.json());
             }
         }
-    }
+    },
+    methods: {
+        callapi() {
+            this.doSomeThingWithToken();
+        }
+    } 
 }
+
 </script>
