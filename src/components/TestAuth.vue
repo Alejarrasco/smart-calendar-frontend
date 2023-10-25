@@ -17,6 +17,7 @@ export default {
                         Authorization: `Bearer ${token}`
                     }
                 });
+                console.log(await response.json());
             }
         }
     }
