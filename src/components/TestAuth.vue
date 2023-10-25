@@ -12,6 +12,7 @@ export default {
         return {
             doSomeThingWithToken: async () => {
                 const token = await getAccessTokenSilently();
+                console.log("Llamando al endpoint protegido");
                 const response = await fetch('http://localhost:8080/api/v1/protected', {
                     headers: {
                         Authorization: `Bearer ${token}`
