@@ -1,4 +1,5 @@
 <template>
+    <h3>Press this button to test a request to the API</h3>
     <button @click="callapi()">Press Me</button>
 </template>
 

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <hero />
     <hr />
     <TestAuth />
   </div>
