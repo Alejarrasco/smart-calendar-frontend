@@ -56,6 +56,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { fetchSpaces } from "../services/CalendarService";
+import { fetchPlanifications } from "../services/CalendarService";
 
 type Session = {
   subject: string;
@@ -121,7 +122,7 @@ export default defineComponent({
     };
 
     const printSpaceId = (spaceId: number) => {
-      console.log(`Space ID: ${spaceId}`);
+      loadCalendarPlanifications(spaceId);
     };
 
     const getSession = (day: string, timeSlot: string): Session | null => {
@@ -153,6 +154,28 @@ export default defineComponent({
     };
 
     loadSpaces();
+
+    const loadCalendarPlanifications = async (spaceId: number) => {
+      const response = await fetchPlanifications(spaceId);
+      if (response && response.data) {
+        const planifications = response.data;
+        schedule.value = {
+          Lunes: {
+            "08:00": {
+              subject: planifications.MON[3].subjectName,
+              responsible: planifications.MON[3].last_name,
+              start_time: planifications.MON[3].start_time,
+              end_time: planifications.MON[3].end_time,
+            }
+          },
+          Martes: {},
+          Miércoles: {},
+          Jueves: {},
+          Viernes: {},
+        };
+      }
+    };
+
 
     return {
       days,
