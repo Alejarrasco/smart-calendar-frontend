@@ -162,20 +162,122 @@ export default defineComponent({
         schedule.value = {
           Lunes: {
             "08:00": {
-              subject: planifications.MON[3].subjectName,
-              responsible: planifications.MON[3].last_name,
-              start_time: planifications.MON[3].start_time,
-              end_time: planifications.MON[3].end_time,
-            }
+              subject: planifications.MON["08:00:00"].subjectName,
+              responsible: planifications.MON["08:00:00"].last_name,
+              start_time: planifications.MON["08:00:00"].start_time,
+              end_time: planifications.MON["08:00:00"].end_time,
+            },
+            "08:30": {
+              subject: planifications.MON["08:30:00"].subjectName,
+              responsible: planifications.MON["08:30:00"].last_name,
+              start_time: planifications.MON["08:30:00"].start_time,
+              end_time: planifications.MON["08:30:00"].end_time,
+            },
+            "09:00": {
+              subject: planifications.MON["09:00:00"].subjectName,
+              responsible: planifications.MON["09:00:00"].last_name,
+              start_time: planifications.MON["09:00:00"].start_time,
+              end_time: planifications.MON["09:00:00"].end_time,
+            },
+            "09:30": {
+              subject: planifications.MON["09:30:00"].subjectName,
+              responsible: planifications.MON["09:30:00"].last_name,
+              start_time: planifications.MON["09:30:00"].start_time,
+              end_time: planifications.MON["09:30:00"].end_time,
+            },
+            "10:00": {
+              subject: planifications.MON["10:00:00"].subjectName,
+              responsible: planifications.MON["10:00:00"].last_name,
+              start_time: planifications.MON["10:00:00"].start_time,
+              end_time: planifications.MON["10:00:00"].end_time,
+            },
+            "10:30": {
+              subject: planifications.MON["10:30:00"].subjectName,
+              responsible: planifications.MON["10:30:00"].last_name,
+              start_time: planifications.MON["10:30:00"].start_time,
+              end_time: planifications.MON["10:30:00"].end_time,
+            },
+            "11:00": {
+              subject: planifications.MON["11:00:00"].subjectName,
+              responsible: planifications.MON["11:00:00"].last_name,
+              start_time: planifications.MON["11:00:00"].start_time,
+              end_time: planifications.MON["11:00:00"].end_time,
+            },
+            "11:30": {
+              subject: planifications.MON["11:30:00"].subjectName,
+              responsible: planifications.MON["11:30:00"].last_name,
+              start_time: planifications.MON["11:30:00"].start_time,
+              end_time: planifications.MON["11:30:00"].end_time,
+            },
+            "12:00": {
+              subject: planifications.MON["12:00:00"].subjectName,
+              responsible: planifications.MON["12:00:00"].last_name,
+              start_time: planifications.MON["12:00:00"].start_time,
+              end_time: planifications.MON["12:00:00"].end_time,
+            },
           },
           Martes: {},
           Miércoles: {},
-          Jueves: {},
+          Jueves: {
+            "08:00": {
+              subject: planifications.THU["08:00:00"].subjectName,
+              responsible: planifications.THU["08:00:00"].last_name,
+              start_time: planifications.THU["08:00:00"].start_time,
+              end_time: planifications.THU["08:00:00"].end_time,
+            },
+            "08:30": {
+              subject: planifications.THU["08:30:00"].subjectName,
+              responsible: planifications.THU["08:30:00"].last_name,
+              start_time: planifications.THU["08:30:00"].start_time,
+              end_time: planifications.THU["08:30:00"].end_time,
+            },
+            "09:00": {
+              subject: planifications.THU["09:00:00"].subjectName,
+              responsible: planifications.THU["09:00:00"].last_name,
+              start_time: planifications.THU["09:00:00"].start_time,
+              end_time: planifications.THU["09:00:00"].end_time,
+            },
+            "09:30": {
+              subject: planifications.THU["09:30:00"].subjectName,
+              responsible: planifications.THU["09:30:00"].last_name,
+              start_time: planifications.THU["09:30:00"].start_time,
+              end_time: planifications.THU["09:30:00"].end_time,
+            },
+            "10:00": {
+              subject: planifications.THU["10:00:00"].subjectName,
+              responsible: planifications.THU["10:00:00"].last_name,
+              start_time: planifications.THU["10:00:00"].start_time,
+              end_time: planifications.THU["10:00:00"].end_time,
+            },
+            "10:30": {
+              subject: planifications.THU["10:30:00"].subjectName,
+              responsible: planifications.THU["10:30:00"].last_name,
+              start_time: planifications.THU["10:30:00"].start_time,
+              end_time: planifications.THU["10:30:00"].end_time,
+            },
+            "11:00": {
+              subject: planifications.THU["11:00:00"].subjectName,
+              responsible: planifications.THU["11:00:00"].last_name,
+              start_time: planifications.THU["11:00:00"].start_time,
+              end_time: planifications.THU["11:00:00"].end_time,
+            },
+            "11:30": {
+              subject: planifications.THU["11:30:00"].subjectName,
+              responsible: planifications.THU["11:30:00"].last_name,
+              start_time: planifications.THU["11:30:00"].start_time,
+              end_time: planifications.THU["11:30:00"].end_time,
+            },
+            "12:00": {
+              subject: planifications.THU["12:00:00"].subjectName,
+              responsible: planifications.THU["12:00:00"].last_name,
+              start_time: planifications.THU["12:00:00"].start_time,
+              end_time: planifications.THU["12:00:00"].end_time,
+            },
+          },
           Viernes: {},
         };
       }
     };
-
 
     return {
       days,
