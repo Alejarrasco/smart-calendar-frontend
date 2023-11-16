@@ -16,7 +16,11 @@
             {{ item.title }}
           </div>
           <ul v-show="item.show" class="accordion-content">
-            <li v-for="subItem in item.subItems" :key="subItem">
+            <li
+              v-for="(subItem, subIndex) in item.subItems"
+              :key="subItem"
+              @click="printSpaceId(item.subItemIds[subIndex])"
+            >
               {{ subItem }}
             </li>
           </ul>
@@ -33,11 +37,11 @@
           <tbody>
             <tr v-for="timeSlot in timeSlots" :key="timeSlot">
               <td v-for="day in days" :key="day">
-                <div class="session-card" v-if="getSession(day, timeSlot)">
-                  <h3>{{ getSession(day, timeSlot).subject }}</h3>
+                <div v-if="getSession(day, timeSlot)" class="session-card">
+                  <h3>{{ getSession(day, timeSlot)?.subject }}</h3>
                   <p>
-                    {{ getSession(day, timeSlot).start_time }} -
-                    {{ getSession(day, timeSlot).end_time }}
+                    {{ getSession(day, timeSlot)?.start_time }} -
+                    {{ getSession(day, timeSlot)?.end_time }}
                   </p>
                 </div>
               </td>
@@ -71,9 +75,9 @@ type WeeklySchedule = {
 type AccordionItem = {
   title: string;
   subItems: string[];
+  subItemIds: number[];
   show: boolean;
 };
-
 interface Space {
   spaceId: number;
   spaceName: string;
@@ -100,14 +104,7 @@ export default defineComponent({
     ]);
 
     const schedule = ref<WeeklySchedule>({
-      Lunes: {
-        "08:00": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-      },
+      Lunes: {},
       Martes: {},
       Miércoles: {},
       Jueves: {},
@@ -123,28 +120,38 @@ export default defineComponent({
       });
     };
 
-    const getSession = (day: string, timeSlot: string): Session => {
+    const printSpaceId = (spaceId: number) => {
+      console.log(`Space ID: ${spaceId}`);
+    };
+
+    const getSession = (day: string, timeSlot: string): Session | null => {
       const daySchedule = schedule.value[day];
-      if (daySchedule && daySchedule[timeSlot]) {
-        return daySchedule[timeSlot]!;
-      }
-      return { subject: "", responsible: "", start_time: "", end_time: "" };
+      return daySchedule ? daySchedule[timeSlot] || null : null;
     };
 
     const loadSpaces = async () => {
       const response = await fetchSpaces();
       if (response && response.data) {
         accordionItems.value = Object.keys(response.data).map((key) => {
+          const spaces: string[] = [];
+          const spaceIds: number[] = [];
+
+          response.data[key].forEach((space: Space) => {
+            // Tipo 'Space' aplicado aquí
+            spaces.push(space.spaceName);
+            spaceIds.push(space.spaceId);
+          });
+
           return {
             title: key,
-            subItems: response.data[key].map((space: Space) => space.spaceName),
+            subItems: spaces,
+            subItemIds: spaceIds,
             show: false,
           };
         });
       }
     };
 
-    // Llamada inicial al cargar el componente
     loadSpaces();
 
     return {
@@ -154,6 +161,7 @@ export default defineComponent({
       accordionItems,
       toggleAccordionItem,
       getSession,
+      printSpaceId,
     };
   },
 });
