@@ -6,12 +6,16 @@
     </div>
     <div class="calendar-body">
       <div class="calendar-sidebar">
-        <!-- Acá empieza el acordeón -->
-        <div v-for="(item, index) in accordionItems" :key="item.title">
+        <!-- Aquí empieza el acordeón -->
+        <div
+          v-for="(item, index) in accordionItems"
+          :key="item.title"
+          class="accordion-item"
+        >
           <div class="accordion-title" @click="toggleAccordionItem(index)">
             {{ item.title }}
           </div>
-          <ul v-show="item.show">
+          <ul v-show="item.show" class="accordion-content">
             <li v-for="subItem in item.subItems" :key="subItem">
               {{ subItem }}
             </li>
@@ -46,7 +50,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, Ref, ref } from "vue";
+import { defineComponent, ref } from "vue";
+import { fetchSpaces } from "../services/CalendarService";
 
 type Session = {
   subject: string;
@@ -63,13 +68,38 @@ type WeeklySchedule = {
   [day: string]: DailySchedule;
 };
 
+type AccordionItem = {
+  title: string;
+  subItems: string[];
+  show: boolean;
+};
+
+interface Space {
+  spaceId: number;
+  spaceName: string;
+  spaceDescription: string;
+  spaceStatus: string;
+  spaceType: string;
+  capacity: number;
+}
+
 export default defineComponent({
   name: "CalendarView",
   setup() {
     const days = ref(["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]);
-    const timeSlots = ref(["08:00", "08:30", "09:00", "09:30", "10:00"]);
+    const timeSlots = ref([
+      "08:00",
+      "08:30",
+      "09:00",
+      "09:30",
+      "10:00",
+      "10:30",
+      "11:00",
+      "11:30",
+      "12:00",
+    ]);
 
-    const schedule: Ref<WeeklySchedule> = ref({
+    const schedule = ref<WeeklySchedule>({
       Lunes: {
         "08:00": {
           subject: "Math",
@@ -77,84 +107,14 @@ export default defineComponent({
           start_time: "08:00",
           end_time: "08:30",
         },
-        "08:30": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        "09:00": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        "09:30": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        "10:00": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        // ... más sesiones para 'Lunes'
       },
-      Martes: {
-        "08:00": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        "08:30": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        "09:00": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        "09:30": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        "10:00": {
-          subject: "Math",
-          responsible: "John Doe",
-          start_time: "08:00",
-          end_time: "08:30",
-        },
-        // ... más sesiones para 'Martes'
-      },
+      Martes: {},
       Miércoles: {},
       Jueves: {},
       Viernes: {},
-      // ... y así para el resto de los días
     });
 
-    const accordionItems = ref([
-      { title: "Aulas", subItems: ["Aula 1", "Aula 2", "Aula 3"], show: false },
-      {
-        title: "Laboratorios",
-        subItems: ["Laboratorio 1", "Laboratorio 2"],
-        show: false,
-      },
-      {
-        title: "Auditorios",
-        subItems: ["Auditorio 1", "Auditorio 2"],
-        show: false,
-      },
-    ]);
+    const accordionItems = ref<AccordionItem[]>([]);
 
     const toggleAccordionItem = (index: number) => {
       accordionItems.value[index].show = !accordionItems.value[index].show;
@@ -170,6 +130,22 @@ export default defineComponent({
       }
       return { subject: "", responsible: "", start_time: "", end_time: "" };
     };
+
+    const loadSpaces = async () => {
+      const response = await fetchSpaces();
+      if (response && response.data) {
+        accordionItems.value = Object.keys(response.data).map((key) => {
+          return {
+            title: key,
+            subItems: response.data[key].map((space: Space) => space.spaceName),
+            show: false,
+          };
+        });
+      }
+    };
+
+    // Llamada inicial al cargar el componente
+    loadSpaces();
 
     return {
       days,
