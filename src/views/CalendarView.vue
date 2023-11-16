@@ -162,10 +162,10 @@ export default defineComponent({
         schedule.value = {
           Lunes: {
             "08:00": {
-              subject: planifications.MON[3].subjectName,
-              responsible: planifications.MON[3].last_name,
-              start_time: planifications.MON[3].start_time,
-              end_time: planifications.MON[3].end_time,
+              subject: planifications.MON["08:00:00"].subjectName,
+              responsible: planifications.MON["08:00:00"].last_name,
+              start_time: planifications.MON["08:00:00"].start_time,
+              end_time: planifications.MON["08:00:00"].end_time,
             }
           },
           Martes: {},
