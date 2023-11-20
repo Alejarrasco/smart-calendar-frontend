@@ -93,16 +93,16 @@ export default defineComponent({
   setup() {
     const days = ref(["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]);
     const timeSlots = ref([
-      "08:00",
-      "08:30",
-      "09:00",
-      "09:30",
-      "10:00",
-      "10:30",
-      "11:00",
-      "11:30",
-      "12:00",
-    ]);
+        "08:00:00",
+        "08:30:00",
+        "09:00:00",
+        "09:30:00",
+        "10:00:00",
+        "10:30:00",
+        "11:00:00",
+        "11:30:00",
+        "12:00:00",
+      ]);
 
     const schedule = ref<WeeklySchedule>({
       Lunes: {},
@@ -155,27 +155,181 @@ export default defineComponent({
 
     loadSpaces();
 
-    const loadCalendarPlanifications = async (spaceId: number) => {
-      const response = await fetchPlanifications(spaceId);
-      if (response && response.data) {
-        const planifications = response.data;
-        schedule.value = {
-          Lunes: {
-            "08:00": {
-              subject: planifications.MON["08:00:00"].subjectName,
-              responsible: planifications.MON["08:00:00"].last_name,
-              start_time: planifications.MON["08:00:00"].start_time,
-              end_time: planifications.MON["08:00:00"].end_time,
-            }
-          },
-          Martes: {},
-          Miércoles: {},
-          Jueves: {},
-          Viernes: {},
-        };
+    const clearCalendar = () => {
+      for (var i = 0; i < days.value.length; i++) {
+        for (var j = 0; j < timeSlots.value.length; j++) {
+          schedule.value[days.value[i]][timeSlots.value[j]] = {
+            subject: "vacio",
+            responsible: "-",
+            start_time: "-",
+            end_time: "-",
+          };
+        }
       }
     };
 
+    const loadCalendarPlanifications = async (spaceId: number) => {
+      clearCalendar();
+      const daysonweek = ["MON", "TUE", "WED", "THU", "FRI"];
+      const daysonweekspanish = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+      const times = [
+        "08:00:00",
+        "08:30:00",
+        "09:00:00",
+        "09:30:00",
+        "10:00:00",
+        "10:30:00",
+        "11:00:00",
+        "11:30:00",
+        "12:00:00",
+      ]
+      const response = await fetchPlanifications(spaceId);
+      if (response && response.data) {
+        const planifications = response.data;
+        console.log(planifications);
+        console.log(planifications[daysonweek[0]]["08:00:00"]);
+        for (var i = 0; i < daysonweek.length; i++) {
+          for (const timeSlot in times) {
+            try {
+              const session = planifications[daysonweek[i]][times[timeSlot]];
+              //console.log(daysonweek[i]);
+              //console.log(times[timeSlot]);
+              //console.log(planifications[daysonweek[i]][times[timeSlot]]);
+              schedule.value[daysonweekspanish[i]][times[timeSlot]] = {
+                subject: session.subjectName,
+                responsible: session.lastName,
+                start_time: session.startTime,
+                end_time: session.endTime,
+              };
+            } catch (error) {
+              schedule.value[daysonweekspanish[i]][timeSlot] = {
+                subject: "vacio",
+                responsible: "-",
+                start_time: "-",
+                end_time: "-",
+              };
+            }
+          }
+        }
+        /* schedule.value = {
+          Lunes: {
+            "08:00": {
+              subject: planifications.MON["08:00:00"].subjectName,
+              responsible: planifications.MON["08:00:00"].lastName,
+              start_time: planifications.MON["08:00:00"].startTime,
+              end_time: planifications.MON["08:00:00"].endTime,
+            },
+            "08:30": {
+              subject: planifications.MON["08:30:00"].subjectName,
+              responsible: planifications.MON["08:30:00"].lastName,
+              start_time: planifications.MON["08:30:00"].startTime,
+              end_time: planifications.MON["08:30:00"].endTime,
+            },
+            "09:00": {
+              subject: planifications.MON["09:00:00"].subjectName,
+              responsible: planifications.MON["09:00:00"].lastName,
+              start_time: planifications.MON["09:00:00"].startTime,
+              end_time: planifications.MON["09:00:00"].endTime,
+            },
+            "09:30": {
+              subject: planifications.MON["09:30:00"].subjectName,
+              responsible: planifications.MON["09:30:00"].lastName,
+              start_time: planifications.MON["09:30:00"].startTime,
+              end_time: planifications.MON["09:30:00"].endTime,
+            },
+            "10:00": {
+              subject: planifications.MON["10:00:00"].subjectName,
+              responsible: planifications.MON["10:00:00"].lastName,
+              start_time: planifications.MON["10:00:00"].startTime,
+              end_time: planifications.MON["10:00:00"].endTime,
+            },
+            "10:30": {
+              subject: planifications.MON["10:30:00"].subjectName,
+              responsible: planifications.MON["10:30:00"].lastName,
+              start_time: planifications.MON["10:30:00"].startTime,
+              end_time: planifications.MON["10:30:00"].endTime,
+            },
+            "11:00": {
+              subject: planifications.MON["11:00:00"].subjectName,
+              responsible: planifications.MON["11:00:00"].lastName,
+              start_time: planifications.MON["11:00:00"].startTime,
+              end_time: planifications.MON["11:00:00"].endTime,
+            },
+            "11:30": {
+              subject: planifications.MON["11:30:00"].subjectName,
+              responsible: planifications.MON["11:30:00"].lastName,
+              start_time: planifications.MON["11:30:00"].startTime,
+              end_time: planifications.MON["11:30:00"].endTime,
+            },
+            "12:00": {
+              subject: planifications.MON["12:00:00"].subjectName,
+              responsible: planifications.MON["12:00:00"].lastName,
+              start_time: planifications.MON["12:00:00"].startTime,
+              end_time: planifications.MON["12:00:00"].endTime,
+            },
+          },
+          Martes: {},
+          Miércoles: {},
+          Jueves: {
+            "08:00": {
+              subject: planifications.THU["08:00:00"].subjectName,
+              responsible: planifications.THU["08:00:00"].lastName,
+              start_time: planifications.THU["08:00:00"].startTime,
+              end_time: planifications.THU["08:00:00"].endTime,
+            },
+            "08:30": {
+              subject: planifications.THU["08:30:00"].subjectName,
+              responsible: planifications.THU["08:30:00"].lastName,
+              start_time: planifications.THU["08:30:00"].startTime,
+              end_time: planifications.THU["08:30:00"].endTime,
+            },
+            "09:00": {
+              subject: planifications.THU["09:00:00"].subjectName,
+              responsible: planifications.THU["09:00:00"].lastName,
+              start_time: planifications.THU["09:00:00"].startTime,
+              end_time: planifications.THU["09:00:00"].endTime,
+            },
+            "09:30": {
+              subject: planifications.THU["09:30:00"].subjectName,
+              responsible: planifications.THU["09:30:00"].lastName,
+              start_time: planifications.THU["09:30:00"].startTime,
+              end_time: planifications.THU["09:30:00"].endTime,
+            },
+            "10:00": {
+              subject: planifications.THU["10:00:00"].subjectName,
+              responsible: planifications.THU["10:00:00"].lastName,
+              start_time: planifications.THU["10:00:00"].startTime,
+              end_time: planifications.THU["10:00:00"].endTime,
+            },
+            "10:30": {
+              subject: planifications.THU["10:30:00"].subjectName,
+              responsible: planifications.THU["10:30:00"].lastName,
+              start_time: planifications.THU["10:30:00"].startTime,
+              end_time: planifications.THU["10:30:00"].endTime,
+            },
+            "11:00": {
+              subject: planifications.THU["11:00:00"].subjectName,
+              responsible: planifications.THU["11:00:00"].lastName,
+              start_time: planifications.THU["11:00:00"].startTime,
+              end_time: planifications.THU["11:00:00"].endTime,
+            },
+            "11:30": {
+              subject: planifications.THU["11:30:00"].subjectName,
+              responsible: planifications.THU["11:30:00"].lastName,
+              start_time: planifications.THU["11:30:00"].startTime,
+              end_time: planifications.THU["11:30:00"].endTime,
+            },
+            "12:00": {
+              subject: planifications.THU["12:00:00"].subjectName,
+              responsible: planifications.THU["12:00:00"].lastName,
+              start_time: planifications.THU["12:00:00"].startTime,
+              end_time: planifications.THU["12:00:00"].endTime,
+            },
+          },
+          Viernes: {},
+        }; */
+      }
+    };
 
     return {
       days,
