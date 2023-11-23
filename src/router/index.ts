@@ -8,6 +8,9 @@ import Profile from "../views/Profile.vue";
 import { createAuthGuard } from "@auth0/auth0-vue";
 import { App } from "vue";
 import CalendarView from "../views/CalendarView.vue";
+import SpaceForm from "../views/SpaceForm.vue";
+import SubjectForm from "../views/SubjectForm.vue";
+import ResponsibleForm from "../views/ResponsibleForm.vue";
 
 export function createRouter(app: App): Router {
   return createVueRouter({
@@ -28,6 +31,23 @@ export function createRouter(app: App): Router {
         name: "calendar",
         component: CalendarView,
         // Puedes agregar 'beforeEnter' si necesitas algún guard específico para esta ruta
+      },
+      {
+        path: "/spaceForm",
+        name: "spaceForm",
+        component: SpaceForm,
+        // Puedes agregar 'beforeEnter' si necesitas algún guard específico para esta ruta
+      },
+      {
+        path: "/subjectForm",
+        name: "subjectForm",
+        component: SubjectForm,
+        // Puedes agregar 'beforeEnter' si necesitas algún guard específico para esta ruta
+      },
+      {
+        path: "/responsibleForm",
+        name: "responsibleForm",
+        component: ResponsibleForm,
       },
     ],
     history: createWebHashHistory(),
