@@ -1,177 +1,224 @@
 <template>
-  <div class="container">
-    <form @submit.prevent="createSpace" class="form">
-      <h2 class="form-title">Nuevo espacio</h2>
+  <div class="laboratory-form-container">
+    <div class="form-group">
+      <label for="laboratory-name">Nombre:</label>
+      <input
+        type="text"
+        id="laboratory-name"
+        v-model="laboratoryName"
+        class="form-input laboratory-name-input"
+      />
+    </div>
 
-      <div class="form-group">
-        <label for="nombre">Nombre:</label>
-        <input
-          type="text"
-          id="nombre"
-          v-model="space.nombre"
-          class="form-control"
-        />
-      </div>
+    <div class="form-group">
+      <label for="belongs-to">Pertenece a:</label>
+      <select id="belongs-to" class="form-dropdown">
+        <option value="laboratorios">Laboratorios</option>
+        <option value="departamento1">Departamento 1</option>
+        <option value="departamento2">Departamento 2</option>
+      </select>
+    </div>
 
-      <div class="form-group">
-        <label for="descripcion">Descripción:</label>
-        <input
-          type="text"
-          id="descripcion"
-          v-model="space.descripcion"
-          class="form-control"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="tipo">Tipo:</label>
-        <input
-          type="text"
-          id="tipo"
-          v-model="space.tipo"
-          class="form-control"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="capacidad">Capacidad:</label>
-        <input
-          type="number"
-          id="capacidad"
-          v-model="space.capacidad"
-          class="form-control"
-        />
-      </div>
-
-      <div class="form-group form-group-date">
-        <label for="fecha-de">Fecha - De:</label>
+    <div class="form-group date-range-group">
+      <label for="available-dates">Fechas Disponibles</label>
+      <div class="date-range">
         <input
           type="date"
-          id="fecha-de"
-          v-model="space.fechaDe"
-          class="form-control"
+          id="start-date"
+          class="form-input date-input"
+          placeholder="Desde"
         />
-        <label for="fecha-a">A:</label>
         <input
           type="date"
-          id="fecha-a"
-          v-model="space.fechaA"
-          class="form-control"
+          id="end-date"
+          class="form-input date-input"
+          placeholder="Hasta"
         />
       </div>
+    </div>
 
-      <div class="form-actions">
-        <button type="button" @click="cancel" class="btn-cancel">
-          Cancelar
-        </button>
-        <button type="submit" class="btn-create">Crear</button>
+    <div class="form-group time-slots-group">
+      <label for="available-times">Horas Disponibles</label>
+      <div class="time-slots">
+        <div
+          v-for="(timeSlot, index) in timeSlots"
+          :key="index"
+          class="time-slot"
+        >
+          <input
+            type="time"
+            v-model="timeSlot.start"
+            class="form-input time-input"
+          />
+          <span>A</span>
+          <input
+            type="time"
+            v-model="timeSlot.end"
+            class="form-input time-input"
+          />
+        </div>
       </div>
-    </form>
+      <button type="button" @click="addTimeSlot" class="btn add-time-btn">
+        Añadir Horario
+      </button>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn open-space-btn">Abrir Espacio</button>
+      <button type="button" class="btn close-space-btn">
+        Clausurar Espacio
+      </button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 
+interface TimeSlot {
+  start: string;
+  end: string;
+}
+
 export default defineComponent({
-  name: "SpaceCreationForm",
+  name: "LaboratoryForm",
   setup() {
-    const space = ref({
-      nombre: "",
-      descripcion: "",
-      tipo: "",
-      capacidad: 0,
-      fechaDe: "",
-      fechaA: "",
-    });
+    const laboratoryName = ref("");
+    const timeSlots = ref<TimeSlot[]>([{ start: "", end: "" }]);
 
-    function createSpace() {
-      // Lógica para crear el espacio
-      console.log("Espacio creado:", space.value);
-    }
-
-    function cancel() {
-      // Lógica para cancelar la creación del espacio
-      console.log("Creación cancelada");
+    function addTimeSlot() {
+      timeSlots.value.push({ start: "", end: "" });
     }
 
     return {
-      space,
-      createSpace,
-      cancel,
+      laboratoryName,
+      timeSlots,
+      addTimeSlot,
     };
   },
 });
 </script>
 
 <style scoped>
-.container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.laboratory-name-input {
+  font-size: 1em; /* Tamaño de fuente estándar */
+  font-weight: normal; /* Peso de fuente normal, no negrita */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px; /* Ajusta el relleno para reducir el espacio si es necesario */
+  margin-bottom: 10px; /* Espacio debajo del campo de texto */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Sombra suave alrededor del campo */
+  width: 100%; /* Ancho completo para alinearse con otros elementos */
+  box-sizing: border-box; /* Asegura que el padding y border no aumenten el ancho total */
 }
-.form {
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.laboratory-name-input {
+  font-size: 1.5em;
+  font-weight: bold;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.laboratory-name-input:focus {
+  outline: 2px solid #007bff; /* Estilo del contorno al enfocar */
+  box-shadow: 0 0 8px rgba(0, 0, 255, 0.2); /* Sombra más destacada al enfocar */
+}
+
+.form-dropdown,
+.form-input,
+.date-input,
+.time-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.date-range-group,
+.time-slots-group {
   display: flex;
   flex-direction: column;
 }
-.form-title {
-  text-align: center;
-  margin-bottom: 20px;
+
+.date-range {
+  display: flex;
+  justify-content: start;
+  gap: 10px;
 }
-.form-group {
-  margin-bottom: 15px;
+
+.time-slots {
+  margin-bottom: 10px;
 }
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-}
-.form-group input.form-control,
-.form-group select.form-control {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.input-group {
+
+.time-slot {
   display: flex;
   align-items: center;
+  margin-bottom: 5px;
 }
-.input-group .form-control {
-  flex-grow: 1;
-  margin-right: 5px;
+
+.button-container {
+  display: flex;
+  justify-content: flex-start;
 }
-.btn-add {
-  padding: 10px;
+
+.btn {
+  padding: 10px 15px;
   border: none;
-  border-radius: 50%; /* Makes the button round */
-  background-color: #007bff;
-  color: white;
+  border-radius: 4px;
   cursor: pointer;
+  margin-top: 10px;
+  color: white;
+  font-weight: bold;
 }
+
+.add-time-btn {
+  background-color: #007bff;
+  text-align: center;
+}
+
+.add-time-btn:hover {
+  background-color: #0056b3;
+}
+
 .form-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
+  gap: 10px;
 }
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px; /* Rounded borders for buttons */
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+
+.open-space-btn {
+  background-color: #28a745;
 }
-.btn-cancel {
-  background-color: #f44336;
-  color: white;
+
+.close-space-btn {
+  background-color: #dc3545;
 }
-.btn-create {
-  background-color: #4caf50;
-  color: white;
+
+.open-space-btn:hover {
+  background-color: #218838;
 }
-.btn:hover {
-  filter: brightness(90%);
+
+.close-space-btn:hover {
+  background-color: #c82333;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5em; /* Ajusta esto para controlar el espacio debajo de la etiqueta */
+}
+
+.form-dropdown {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* Añadir si se desea un poco de espacio a la izquierda de la etiqueta */
+  margin-left: 0.5em;
 }
 </style>

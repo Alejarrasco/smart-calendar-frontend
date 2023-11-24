@@ -11,6 +11,7 @@ import CalendarView from "../views/CalendarView.vue";
 import SpaceForm from "../views/SpaceForm.vue";
 import SubjectForm from "../views/SubjectForm.vue";
 import ResponsibleForm from "../views/ResponsibleForm.vue";
+import SubjectView from "../views/SubjectView.vue";
 
 export function createRouter(app: App): Router {
   return createVueRouter({
@@ -48,6 +49,11 @@ export function createRouter(app: App): Router {
         path: "/responsibleForm",
         name: "responsibleForm",
         component: ResponsibleForm,
+      },
+      {
+        path: "/subjectView",
+        name: "subjectView",
+        component: SubjectView,
       },
     ],
     history: createWebHashHistory(),
