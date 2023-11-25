@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { fetchSpaces } from "../services/CalendarService";
+import { fetchSpaces } from "../services/SpaceService";
 import { fetchPlanifications } from "../services/CalendarService";
 
 type Session = {

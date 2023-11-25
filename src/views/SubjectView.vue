@@ -12,10 +12,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="subject in subjects" :key="subject.id">
-            <td>{{ subject.name }}</td>
-            <td>{{ subject.description }}</td>
-            <td>{{ subject.code }}</td>
+          <tr v-for="(subject, index) in subjects" :key="index">
+            <td>{{ subject.subjectName }}</td>
+            <td>{{ subject.subjectDescription }}</td>
+            <td>{{ subject.subjectCode }}</td>
             <td>
               <!-- Opciones como editar o eliminar -->
               <button @click="editSubject(subject)">Editar</button>
@@ -30,12 +30,14 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { fetchSubjects } from "../services/SubjectService";
 
 interface Subject {
-  id: number;
-  name: string;
-  description: string;
-  code: string;
+  facultyName: string;
+  subjectName: string;
+  subjectDescription: string;
+  subjectCode: string;
+  responsiblesIds: number[];
 }
 
 export default defineComponent({
@@ -60,6 +62,11 @@ export default defineComponent({
       editSubject,
       deleteSubject,
     };
+  },
+  mounted() {
+    // Lógica para obtener las materias
+    fetchSubjects().then((subjects) => (this.subjects = subjects));
+
   },
 });
 </script>
