@@ -12,6 +12,7 @@ import SpaceForm from "../views/SpaceForm.vue";
 import SubjectForm from "../views/SubjectForm.vue";
 import ResponsibleForm from "../views/ResponsibleForm.vue";
 import SubjectView from "../views/SubjectView.vue";
+import SolicitudeForm from "../views/SolicitudeForm.vue";
 
 export function createRouter(app: App): Router {
   return createVueRouter({
@@ -54,6 +55,11 @@ export function createRouter(app: App): Router {
         path: "/subjectView",
         name: "subjectView",
         component: SubjectView,
+      },
+      {
+        path: "/solicitudeForm",
+        name: "solicitudeForm",
+        component: SolicitudeForm,
       },
     ],
     history: createWebHashHistory(),
