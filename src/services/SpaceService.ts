@@ -32,3 +32,18 @@ export const fetchSpace = async (spaceId: number) => {
       return null;
     }
 };
+
+export const createSpace = async (space: any) => {
+    console.log("space", space);
+    try {
+      const response = await axios.post(API_URL, space, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating space:", error);
+      return null;
+    }
+}
