@@ -1,14 +1,11 @@
 <template>
   <div class="reservation-form-container">
+    <!-- Combinación de laboratorio y espacio en un solo campo -->
     <div class="form-group">
-      <label for="laboratory">Laboratorio:</label>
-      <input
-        type="text"
-        id="laboratory"
-        class="form-input"
-        v-model="reservation.laboratory"
-        readonly
-      />
+      <label for="space">Espacio/Laboratorio:</label>
+      <select id="space" class="form-dropdown" v-model="reservation.space">
+        <option v-for="space in spaces" :value="space">{{ space }}</option>
+      </select>
     </div>
 
     <div class="form-group">
@@ -24,66 +21,60 @@
     <div class="form-group">
       <label for="role">Cargo:</label>
       <select id="role" class="form-dropdown" v-model="reservation.role">
-        <option>Docente</option>
-        <option>Investigador</option>
-        <!-- Añadir más roles si es necesario -->
+        <option v-for="role in roles" :value="role">{{ role }}</option>
       </select>
     </div>
 
     <div class="form-group">
       <label for="subject">Asignatura:</label>
       <select id="subject" class="form-dropdown" v-model="reservation.subject">
-        <option>Química Industrial</option>
-        <option>Química Orgánica I</option>
-        <option>Química Orgánica II</option>
-        <!-- Añadir más asignaturas si es necesario -->
+        <option v-for="subject in filteredSubjects" :value="subject">
+          {{ subject }}
+        </option>
       </select>
     </div>
 
+    <!-- Checkbox para determinar si el horario es recurrente -->
     <div class="form-group">
-      <label for="space">Espacio:</label>
-      <select id="space" class="form-dropdown" v-model="reservation.space">
-        <option>Laboratorio 7</option>
-        <!-- Añadir más espacios si es necesario -->
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Horario</label>
+      <label for="recurring">Horario Recurrente:</label>
       <input type="checkbox" id="recurring" v-model="reservation.isRecurring" />
-      <label for="recurring">Recurrente</label>
-
-      <!-- Horarios recurrentes -->
-      <div v-if="reservation.isRecurring" class="schedule recurring-schedule">
-        <div v-for="day in daysOfWeek" :key="day" class="day-schedule">
-          <input type="checkbox" :id="day" v-model="schedule[day].checked" />
-          <label :for="day">{{ day }}</label>
-          <input
-            type="time"
-            :disabled="!schedule[day].checked"
-            v-model="schedule[day].start"
-          />
-          <input
-            type="time"
-            :disabled="!schedule[day].checked"
-            v-model="schedule[day].end"
-          />
-        </div>
-      </div>
-
-      <!-- Horario no recurrente -->
-      <div v-else class="schedule non-recurring-schedule">
-        <input type="date" v-model="nonRecurringSchedule.date" />
-        <div class="time-slot">
-          <input type="time" v-model="nonRecurringSchedule.start" />
-          <input type="time" v-model="nonRecurringSchedule.end" />
-        </div>
-        <button type="button" @click="addNonRecurringTimeSlot">
-          Añadir Horario
-        </button>
-      </div>
     </div>
 
+    <!-- Configuración de horarios recurrentes -->
+    <div v-if="reservation.isRecurring" class="recurring-schedule">
+      <div v-for="day in weekSchedule" :key="day.day" class="day-schedule">
+        <input type="checkbox" v-model="day.checked" :id="day.day" />
+        <label :for="day.day">{{ day.day }}</label>
+
+        <!-- Horarios para el día seleccionado -->
+        <div v-if="day.checked" class="time-slots">
+          <div
+            v-for="timeSlot in day.timeSlots"
+            :key="timeSlot.label"
+            class="time-slot"
+          >
+            <input
+              type="checkbox"
+              v-model="timeSlot.checked"
+              :id="timeSlot.label"
+            />
+            <label :for="timeSlot.label">{{ timeSlot.label }}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="schedule non-recurring-schedule">
+      <input type="date" v-model="nonRecurringSchedule.date" />
+      <div class="time-slot">
+        <input type="time" v-model="nonRecurringSchedule.start" />
+        <input type="time" v-model="nonRecurringSchedule.end" />
+      </div>
+      <button type="button" @click="addNonRecurringTimeSlot">
+        Añadir Horario
+      </button>
+    </div>
+
+    <!-- Botones de acción del formulario -->
     <div class="form-actions">
       <button type="button" @click="cancelReservation">Cancelar</button>
       <button type="button" @click="saveReservation">Guardar</button>
@@ -95,13 +86,14 @@
 import { defineComponent, reactive } from "vue";
 
 interface TimeSlot {
+  label: string;
   checked: boolean;
-  start: string;
-  end: string;
 }
 
 interface DaySchedule {
-  [key: string]: TimeSlot;
+  day: string;
+  checked: boolean;
+  timeSlots: TimeSlot[];
 }
 
 interface NonRecurringSchedule {
@@ -111,55 +103,98 @@ interface NonRecurringSchedule {
 }
 
 interface Reservation {
-  laboratory: string;
+  space: string;
   responsible: string;
   role: string;
   subject: string;
-  space: string;
   isRecurring: boolean;
 }
 
 export default defineComponent({
   name: "ReservationForm",
   setup() {
-    const daysOfWeek = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+    const weekSchedule = reactive<DaySchedule[]>([
+      {
+        day: "Lun",
+        checked: false,
+        timeSlots: [
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+        ],
+      },
+      {
+        day: "Lun",
+        checked: false,
+        timeSlots: [
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+        ],
+      },
+      {
+        day: "Lun",
+        checked: false,
+        timeSlots: [
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+          { label: "08:00-08:30", checked: false } /* Más horarios */,
+        ],
+      },
+      // Repite para cada día de la semana
+      // ...
+    ]);
     const reservation = reactive<Reservation>({
-      laboratory: "Laboratorio 7 > Química Industrial",
+      space: "",
       responsible: "",
       role: "",
       subject: "",
-      space: "",
       isRecurring: false,
     });
-    const schedule = reactive<DaySchedule>(
-      daysOfWeek.reduce((acc, day) => {
-        acc[day] = { checked: false, start: "", end: "" };
-        return acc;
-      }, {} as DaySchedule)
-    );
     const nonRecurringSchedule = reactive<NonRecurringSchedule>({
       date: "",
       start: "",
       end: "",
     });
+    const allSubjects = [
+      "Química Industrial",
+      "Química Orgánica I",
+      "Química Orgánica II",
+    ]; // Suponiendo que son las asignaturas disponibles
+    const filteredSubjects = reactive<string[]>([]);
+    const spaces = [
+      "Laboratorio 7 - Química Industrial",
+      "Laboratorio 8 - Física Avanzada",
+    ]; // Ejemplo de espacios disponibles
+    const roles = ["Docente", "Investigador"]; // Ejemplo de roles
+
+    // Observar cambios en el responsable para filtrar las asignaturas
 
     function addNonRecurringTimeSlot() {
-      // Implement logic to handle adding non-recurring time slots
+      // Implementar lógica para añadir horarios no recurrentes
     }
 
     function cancelReservation() {
-      // Implement logic to handle reservation cancellation
+      // Implementar lógica para cancelar la reserva
     }
 
     function saveReservation() {
-      // Implement logic to handle saving the reservation
+      // Implementar lógica para guardar la reserva
     }
 
     return {
       reservation,
-      daysOfWeek,
-      schedule,
+      weekSchedule,
+      filteredSubjects,
+      spaces,
       nonRecurringSchedule,
+      roles,
       addNonRecurringTimeSlot,
       cancelReservation,
       saveReservation,
@@ -232,5 +267,14 @@ button[type="button"] {
 
 button[type="button"]:hover {
   background-color: #c82333;
+}
+
+.period-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.period-cell {
+  margin-right: 10px;
 }
 </style>
