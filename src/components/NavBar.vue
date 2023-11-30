@@ -38,6 +38,9 @@
             <li class="nav-item">
               <router-link to="/solicitudeForm" class="nav-link">solicitudeForm</router-link>
             </li>
+            <li class="nav-item">
+              <router-link to="/solicitudeView" class="nav-link">solicitudeView</router-link>
+            </li>
           </ul>
           <ul class="navbar-nav d-none d-md-block">
             <li v-if="!isAuthenticated && !isLoading" class="nav-item">

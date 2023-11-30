@@ -61,6 +61,11 @@ export function createRouter(app: App): Router {
         name: "solicitudeForm",
         component: SolicitudeForm,
       },
+      {
+        path: "/solicitudeView",
+        name: "solicitudeView",
+        component: () => import("../views/SolicitudeView.vue"),
+      }
     ],
     history: createWebHashHistory(),
   });

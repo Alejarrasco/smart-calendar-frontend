@@ -12,6 +12,7 @@ export const fetchSpaces = async () => {
           Accept: "application/json",
         },
       });
+      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error("Error fetching spaces:", error);

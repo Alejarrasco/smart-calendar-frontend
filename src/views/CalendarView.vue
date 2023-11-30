@@ -63,6 +63,8 @@ type Session = {
   responsible: string;
   start_time: string;
   end_time: string;
+  solicitude_status?: string;
+  solicitude_id?: number;
 };
 
 type DailySchedule = {
@@ -163,6 +165,8 @@ export default defineComponent({
             responsible: "-",
             start_time: "-",
             end_time: "-",
+            solicitude_status: "-",
+            solicitude_id: -1,
           };
         }
       }
@@ -187,7 +191,7 @@ export default defineComponent({
       if (response && response.data) {
         const planifications = response.data;
         console.log(planifications);
-        console.log(planifications[daysonweek[0]]["08:00:00"]);
+        //console.log(planifications[daysonweek[0]]["08:00:00"]);
         for (var i = 0; i < daysonweek.length; i++) {
           for (const timeSlot in times) {
             try {
@@ -200,6 +204,8 @@ export default defineComponent({
                 responsible: session.lastName,
                 start_time: session.startTime,
                 end_time: session.endTime,
+                solicitude_status: session.solicitude_status,
+                solicitude_id: session.solicitude_id,
               };
             } catch (error) {
               schedule.value[daysonweekspanish[i]][timeSlot] = {
