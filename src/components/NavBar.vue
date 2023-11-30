@@ -48,13 +48,14 @@
                 id="qsLoginBtn"
                 class="btn btn-primary btn-margin"
                 @click.prevent="login"
-              >Login</button>
+              >
+                Login
+              </button>
             </li>
 
             <li class="nav-item dropdown" v-if="isAuthenticated">
               <a
                 class="nav-link dropdown-toggle"
-                href="#"
                 id="profileDropDown"
                 data-toggle="dropdown"
               >
@@ -67,18 +68,34 @@
               </a>
               <div class="dropdown-menu dropdown-menu-right">
                 <div class="dropdown-header">{{ user?.name }}</div>
-                <router-link to="/profile" class="dropdown-item dropdown-profile">
+                <router-link
+                  to="/profile"
+                  class="dropdown-item dropdown-profile"
+                >
                   <font-awesome-icon class="mr-3" icon="user" />Profile
                 </router-link>
-                <a id="qsLogoutBtn" href="#" class="dropdown-item" @click.prevent="logout">
+                <a
+                  id="qsLogoutBtn"
+                  class="dropdown-item"
+                  @click.prevent="logout"
+                >
                   <font-awesome-icon class="mr-3" icon="power-off" />Log out
                 </a>
               </div>
             </li>
           </ul>
 
-          <ul class="navbar-nav d-md-none" v-if="!isAuthenticated && !isLoading">
-            <button id="qsLoginBtn" class="btn btn-primary btn-block" @click="login">Log in</button>
+          <ul
+            class="navbar-nav d-md-none"
+            v-if="!isAuthenticated && !isLoading"
+          >
+            <button
+              id="qsLoginBtn"
+              class="btn btn-primary btn-block"
+              @click="login"
+            >
+              Log in
+            </button>
           </ul>
 
           <ul
@@ -104,7 +121,7 @@
 
             <li>
               <font-awesome-icon icon="power-off" class="mr-3" />
-              <a id="qsLogoutBtn" href="#" class @click.prevent="logout">Log out</a>
+              <a id="qsLogoutBtn" class @click.prevent="logout">Log out</a>
             </li>
           </ul>
         </div>
@@ -114,13 +131,13 @@
 </template>
 
 <script lang="ts">
-import { useAuth0 } from '@auth0/auth0-vue';
+import { useAuth0 } from "@auth0/auth0-vue";
 
 export default {
   name: "NavBar",
   setup() {
     const auth0 = useAuth0();
-    
+
     return {
       isAuthenticated: auth0.isAuthenticated,
       isLoading: auth0.isLoading,
@@ -131,12 +148,12 @@ export default {
       logout() {
         auth0.logout({
           logoutParams: {
-            returnTo: window.location.origin
-          }
+            returnTo: window.location.origin,
+          },
         });
-      }
-    }
-  }
+      },
+    };
+  },
 };
 </script>
 
