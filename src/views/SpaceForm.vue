@@ -11,12 +11,34 @@
     </div>
 
     <div class="form-group">
+      <label for="laboratory-description">Descripción:</label>
+      <input
+        type="text"
+        id="laboratory-description"
+        v-model="laboratoryDescription"
+        class="form-input laboratory-desc-input"
+      />
+    </div>
+
+    <div class="form-group">
       <label for="belongs-to">Pertenece a:</label>
-      <select id="belongs-to" class="form-dropdown">
-        <option value="laboratorios">Laboratorios</option>
-        <option value="departamento1">Departamento 1</option>
-        <option value="departamento2">Departamento 2</option>
+      <select id="belongs-to" class="form-dropdown" v-model="selectedType">
+        <option value="belongs-to" selected disabled>Pertenece a</option>
+        <option v-for="(spaceType, index) in spaceTypes" :key="index">
+          {{ spaceType }}
+        </option>
       </select>
+    </div>
+
+    <div class="form-group">
+      <label for="capacity">Capacidad:</label>
+      <input
+        type="number"
+        min="1"
+        id="capacity"
+        v-model="capacity"
+        class="form-input capacity-input"
+      />
     </div>
 
     <div class="form-group date-range-group">
@@ -27,12 +49,14 @@
           id="start-date"
           class="form-input date-input"
           placeholder="Desde"
+          v-model="availableDates.start"
         />
         <input
           type="date"
           id="end-date"
           class="form-input date-input"
           placeholder="Hasta"
+          v-model="availableDates.end"
         />
       </div>
     </div>
@@ -64,7 +88,7 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn open-space-btn">Abrir Espacio</button>
+      <button type="button" class="btn open-space-btn" @click="openNewSpace">Abrir Espacio</button>
       <button type="button" class="btn close-space-btn">
         Clausurar Espacio
       </button>
@@ -74,6 +98,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { createSpace } from "../services/SpaceService";
 
 interface TimeSlot {
   start: string;
@@ -84,16 +109,64 @@ export default defineComponent({
   name: "LaboratoryForm",
   setup() {
     const laboratoryName = ref("");
+    const laboratoryDescription = ref("");
+    const spaceTypes = ref(["Auditorio","Aula","Laboratorio"]);
+    const selectedType = ref("");
+    const capacity = ref(1);
+    const availableDates = ref({ start: "", end: "" });
     const timeSlots = ref<TimeSlot[]>([{ start: "", end: "" }]);
 
     function addTimeSlot() {
       timeSlots.value.push({ start: "", end: "" });
     }
 
+    async function openNewSpace() {
+      /* console.log({
+        laboratoryName: laboratoryName.value,
+        laboratoryDescription: laboratoryDescription.value,
+        selectedType: selectedType.value,
+        capacity: capacity.value,
+        availableDates: availableDates.value,
+        timeSlots: timeSlots.value,
+      }); */
+
+      let startTimes = [];
+      let endTimes = [];
+      for (let i = 0; i < timeSlots.value.length; i++) {
+        startTimes.push(timeSlots.value[i].start);
+        endTimes.push(timeSlots.value[i].end);
+      }
+
+      const newSpace = {
+        spaceName: laboratoryName.value,
+        spaceDescription: laboratoryDescription.value,
+        spaceType: selectedType.value,
+        capacity: capacity.value,
+        periodTimes: startTimes,
+        openDate: availableDates.value.start,
+        closeDate: availableDates.value.end,
+      };
+
+      const response = await createSpace(newSpace);
+      console.log(response);
+      if (response.code== "SPAC-0002") {
+        alert("Espacio creado exitosamente");
+      } else {
+        alert("Error al crear el espacio");
+      }
+
+    }
+
     return {
       laboratoryName,
+      laboratoryDescription,
+      spaceTypes,
+      selectedType,
+      capacity,
+      availableDates,
       timeSlots,
       addTimeSlot,
+      openNewSpace,
     };
   },
 });
@@ -128,6 +201,22 @@ export default defineComponent({
 .laboratory-name-input:focus {
   outline: 2px solid #007bff; /* Estilo del contorno al enfocar */
   box-shadow: 0 0 8px rgba(0, 0, 255, 0.2); /* Sombra más destacada al enfocar */
+}
+
+.laboratory-desc-input {
+  font-size: 1em;
+  font-weight: normal;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.capacity-input {
+  width: 100%;
 }
 
 .form-dropdown,
