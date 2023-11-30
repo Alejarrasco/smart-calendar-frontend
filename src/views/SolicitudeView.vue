@@ -19,7 +19,7 @@
                     <td>{{ solicitude.subject_name }}</td>
                     <td>{{ solicitude.responsible_name }}</td>
                     <td>
-                        <button class="btn btn-danger" @click="rejectSolicitude(solicitude.solicitude_id)">
+                        <button class="btn btn-danger" @click="rejectThisSolicitude(solicitude.solicitude_id)">
                             REJECT
                         </button>
                     </td>
@@ -62,15 +62,15 @@ export default {
             }
         });
 
-        const rejectSolicitude = async (solicitudeId: number) => {
+        const rejectThisSolicitude = async (solicitudeId: number) => {
             await rejectSolicitude(solicitudeId);
-            solicitudes.value = [];
-            solicitudes.value = await fetchSolicitudes();
+            //slice the solicitude from the array
+            solicitudes.value = solicitudes.value.filter((solicitude) => solicitude.solicitude_id !== solicitudeId);
         };
 
         return {
             solicitudes,
-            rejectSolicitude,
+            rejectThisSolicitude,
         };
     }
 };
