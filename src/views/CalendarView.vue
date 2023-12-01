@@ -57,10 +57,23 @@
     <button @click="showToast">Mostrar Toast</button>
 
     <!-- Toast de Bootstrap -->
-    <div id="myToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+    <div
+      id="myToast"
+      class="toast"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      data-autohide="false"
+    >
       <div class="toast-header">
         <strong class="mr-auto">Mensaje</strong>
-        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Cerrar" @click="hideToast">
+        <button
+          type="button"
+          class="ml-2 mb-1 close"
+          data-dismiss="toast"
+          aria-label="Cerrar"
+          @click="hideToast"
+        >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -72,10 +85,13 @@
 </template>
 
 <script lang="ts">
-import { Toast } from 'bootstrap';
+import { Toast } from "bootstrap";
 import { defineComponent, onMounted, ref } from "vue";
 import { fetchSpaces } from "../services/SpaceService";
-import { fetchPlanifications } from "../services/CalendarService";
+import {
+  fetchPlanifications,
+  planificationEventTarget,
+} from "../services/CalendarService";
 
 type Session = {
   subject: string;
@@ -115,16 +131,16 @@ export default defineComponent({
     const conflictMessage = ref("No hay conflictos");
     const days = ref(["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]);
     const timeSlots = ref([
-        "08:00:00",
-        "08:30:00",
-        "09:00:00",
-        "09:30:00",
-        "10:00:00",
-        "10:30:00",
-        "11:00:00",
-        "11:30:00",
-        "12:00:00",
-      ]);
+      "08:00:00",
+      "08:30:00",
+      "09:00:00",
+      "09:30:00",
+      "10:00:00",
+      "10:30:00",
+      "11:00:00",
+      "11:30:00",
+      "12:00:00",
+    ]);
 
     const schedule = ref<WeeklySchedule>({
       Lunes: {},
@@ -172,7 +188,7 @@ export default defineComponent({
             show: false,
           };
         });
-      } 
+      }
     };
 
     loadSpaces();
@@ -195,7 +211,13 @@ export default defineComponent({
     const loadCalendarPlanifications = async (spaceId: number) => {
       clearCalendar();
       const daysonweek = ["MON", "TUE", "WED", "THU", "FRI"];
-      const daysonweekspanish = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+      const daysonweekspanish = [
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+      ];
       const times = [
         "08:00:00",
         "08:30:00",
@@ -206,7 +228,7 @@ export default defineComponent({
         "11:00:00",
         "11:30:00",
         "12:00:00",
-      ]
+      ];
       const response = await fetchPlanifications(spaceId);
       if (response && response.data) {
         const planifications = response.data;
@@ -360,10 +382,32 @@ export default defineComponent({
       }
     };
 
-    function showToast(): void {
-      // Muestra el toast
-      const myToast = document.getElementById('myToast');
+    // Agregar event listeners cuando el componente se carga
+    planificationEventTarget.addEventListener(
+      "planificationSuccess",
+      handlePlanificationSuccess
+    );
+    planificationEventTarget.addEventListener(
+      "planificationError",
+      handlePlanificationError
+    );
+
+    function handlePlanificationSuccess(event: Event) {
+      const customEvent = event as CustomEvent; // Casting a CustomEvent
+      console.log("Planification fetched successfully:", customEvent.detail);
+      showToast("Planification fetched successfully!");
+    }
+
+    function handlePlanificationError(event: Event) {
+      const customEvent = event as CustomEvent; // Casting a CustomEvent
+      console.error("Error fetching planification:", customEvent.detail);
+      showToast("Error fetching planification.");
+    }
+
+    function showToast(message: string): void {
+      const myToast = document.getElementById("myToast");
       if (myToast) {
+        myToast.textContent = message; // Asumiendo que quieres mostrar el mensaje en el toast
         // @ts-ignore: Bootstrap Toast no tiene un tipo oficial para TypeScript
         const toast = new Toast(myToast);
         toast.show();
@@ -371,15 +415,13 @@ export default defineComponent({
     }
 
     function hideToast(): void {
-      // Oculta el toast
-      const myToast = document.getElementById('myToast');
+      const myToast = document.getElementById("myToast");
       if (myToast) {
         // @ts-ignore: Bootstrap Toast no tiene un tipo oficial para TypeScript
         const toast = new Toast(myToast);
         toast.hide();
       }
     }
-
     return {
       days,
       timeSlots,
