@@ -48,3 +48,17 @@ export const createSpace = async (space: any) => {
       return null;
     }
 }
+
+export const fetchSpaceTypes = async () => {
+    try {
+      const response = await axios.get(API_URL + "/type/list", {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching space types:", error);
+      return null;
+    }
+};
