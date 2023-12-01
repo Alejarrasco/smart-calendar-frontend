@@ -19,6 +19,11 @@
                     <td>{{ solicitude.subject_name }}</td>
                     <td>{{ solicitude.responsible_name }}</td>
                     <td>
+                        <button class="btn btn-success" @click="approveThisSolicitude(solicitude.solicitude_id)">
+                            APPROVE
+                        </button>
+                    </td>
+                    <td>
                         <button class="btn btn-danger" @click="rejectThisSolicitude(solicitude.solicitude_id)">
                             REJECT
                         </button>
@@ -31,7 +36,7 @@
 
 <script lang="ts">
 import { onMounted, ref } from 'vue';
-import { fetchSolicitudes, rejectSolicitude } from '../services/SolicitudeService';
+import { fetchSolicitudes, approveSolicitude, rejectSolicitude } from '../services/SolicitudeService';
 
 type Solicitude = {
     solicitude_id: number;
@@ -62,6 +67,22 @@ export default {
             }
         });
 
+        const approveThisSolicitude = async (solicitudeId: number) => {
+            try {
+                const request = await approveSolicitude(solicitudeId);
+                if (request && request.data) {
+                    //move the solicitude to the end of the list
+                    const solicitude = solicitudes.value.find((solicitude) => solicitude.solicitude_id === solicitudeId);
+                    solicitudes.value = solicitudes.value.filter((solicitude) => solicitude.solicitude_id !== solicitudeId);
+                    solicitudes.value.push(solicitude!);
+                } else if (request && request.errormessage) {
+                    alert(request.errormessage);//TODO change this to a toast
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
         const rejectThisSolicitude = async (solicitudeId: number) => {
             await rejectSolicitude(solicitudeId);
             //slice the solicitude from the array
@@ -70,6 +91,7 @@ export default {
 
         return {
             solicitudes,
+            approveThisSolicitude,
             rejectThisSolicitude,
         };
     }

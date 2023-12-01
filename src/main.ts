@@ -9,6 +9,7 @@ import authConfig from "../auth_config.json";
 import hljs from "highlight.js/lib/core";
 import json from "highlight.js/lib/languages/json";
 import hljsVuePlugin from "@highlightjs/vue-plugin";
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import "highlight.js/styles/github.css";
 
 hljs.registerLanguage("json", json);

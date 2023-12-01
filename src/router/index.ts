@@ -14,6 +14,7 @@ import SubjectForm from "../views/SubjectForm.vue";
 import ResponsibleForm from "../views/ResponsibleForm.vue";
 import SubjectView from "../views/SubjectView.vue";
 import SolicitudeForm from "../views/SolicitudeForm.vue";
+import SolicitudeView from "../views/SolicitudeView.vue";
 
 // Define las rutas como RouteRecordRaw para un tipado fuerte
 const routes: Array<RouteRecordRaw> = [
@@ -57,6 +58,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "solicitudeForm",
     component: SolicitudeForm,
   },
+  {
+    path: "/solicitudeView",
+    name: "solicitudeView",
+    component: SolicitudeView,
+  }
   // ... aquí irían el resto de tus rutas
 ];
 

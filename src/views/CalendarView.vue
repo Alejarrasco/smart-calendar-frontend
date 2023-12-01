@@ -51,10 +51,29 @@
       </div>
     </div>
   </div>
+
+  <div>
+    <!-- Botón para mostrar el toast -->
+    <button @click="showToast">Mostrar Toast</button>
+
+    <!-- Toast de Bootstrap -->
+    <div id="myToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
+      <div class="toast-header">
+        <strong class="mr-auto">Mensaje</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Cerrar" @click="hideToast">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="toast-body">
+        {{ conflictMessage }}
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { Toast } from 'bootstrap';
+import { defineComponent, onMounted, ref } from "vue";
 import { fetchSpaces } from "../services/SpaceService";
 import { fetchPlanifications } from "../services/CalendarService";
 
@@ -93,6 +112,7 @@ interface Space {
 export default defineComponent({
   name: "CalendarView",
   setup() {
+    const conflictMessage = ref("No hay conflictos");
     const days = ref(["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]);
     const timeSlots = ref([
         "08:00:00",
@@ -152,7 +172,7 @@ export default defineComponent({
             show: false,
           };
         });
-      }
+      } 
     };
 
     loadSpaces();
@@ -216,6 +236,9 @@ export default defineComponent({
               };
             }
           }
+        }
+        if (response.errormessage) {
+          conflictMessage.value = response.errormessage;
         }
         /* schedule.value = {
           Lunes: {
@@ -337,6 +360,26 @@ export default defineComponent({
       }
     };
 
+    function showToast(): void {
+      // Muestra el toast
+      const myToast = document.getElementById('myToast');
+      if (myToast) {
+        // @ts-ignore: Bootstrap Toast no tiene un tipo oficial para TypeScript
+        const toast = new Toast(myToast);
+        toast.show();
+      }
+    }
+
+    function hideToast(): void {
+      // Oculta el toast
+      const myToast = document.getElementById('myToast');
+      if (myToast) {
+        // @ts-ignore: Bootstrap Toast no tiene un tipo oficial para TypeScript
+        const toast = new Toast(myToast);
+        toast.hide();
+      }
+    }
+
     return {
       days,
       timeSlots,
@@ -345,6 +388,10 @@ export default defineComponent({
       toggleAccordionItem,
       getSession,
       printSpaceId,
+      loadSpaces,
+      conflictMessage,
+      showToast,
+      hideToast,
     };
   },
 });
