@@ -17,44 +17,47 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mr-auto">
+            <!-- Siempre mostrar Home -->
             <li class="nav-item">
               <router-link to="/" class="nav-link">Home</router-link>
             </li>
-            <li class="nav-item">
-              <router-link to="/calendarView" class="nav-link"
-                >calendar</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/spaceForm" class="nav-link"
-                >spaceForm</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/subjectForm" class="nav-link"
-                >subjectForm</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/responsibleForm" class="nav-link"
-                >responsibleForm</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/subjectView" class="nav-link"
-                >subjectView</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/solicitudeForm" class="nav-link"
-                >solicitudeForm</router-link
-              >
-            </li>
-            <li class="nav-item">
-              <router-link to="/solicitudeView" class="nav-link"
-                >solicitudeView</router-link
-              >
-            </li>
+            <template v-if="isAuthenticated">
+              <li class="nav-item">
+                <router-link to="/calendarView" class="nav-link"
+                  >calendar</router-link
+                >
+              </li>
+              <li class="nav-item">
+                <router-link to="/spaceForm" class="nav-link"
+                  >spaceForm</router-link
+                >
+              </li>
+              <li class="nav-item">
+                <router-link to="/subjectForm" class="nav-link"
+                  >subjectForm</router-link
+                >
+              </li>
+              <li class="nav-item">
+                <router-link to="/responsibleForm" class="nav-link"
+                  >responsibleForm</router-link
+                >
+              </li>
+              <li class="nav-item">
+                <router-link to="/subjectView" class="nav-link"
+                  >subjectView</router-link
+                >
+              </li>
+              <li class="nav-item">
+                <router-link to="/solicitudeForm" class="nav-link"
+                  >solicitudeForm</router-link
+                >
+              </li>
+              <li class="nav-item">
+                <router-link to="/solicitudeView" class="nav-link"
+                  >solicitudeView</router-link
+                >
+              </li>
+            </template>
           </ul>
           <ul class="navbar-nav d-none d-md-block">
             <li v-if="!isAuthenticated && !isLoading" class="nav-item">
