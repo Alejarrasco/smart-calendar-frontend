@@ -145,8 +145,8 @@ interface NonRecurringSchedule {
 }
 
 interface Reservation {
-  space: number;
-  responsible: number;
+  space: any;
+  responsible: any;
   role: string;
   subject: string;
   isRecurring: boolean;

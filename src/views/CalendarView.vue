@@ -7,20 +7,13 @@
     <div class="calendar-body">
       <div class="calendar-sidebar">
         <!-- Aquí empieza el acordeón -->
-        <div
-          v-for="(item, index) in accordionItems"
-          :key="item.title"
-          class="accordion-item"
-        >
+        <div v-for="(item, index) in accordionItems" :key="item.title" class="accordion-item">
           <div class="accordion-title" @click="toggleAccordionItem(index)">
             {{ item.title }}
           </div>
           <ul v-show="item.show" class="accordion-content">
-            <li
-              v-for="(subItem, subIndex) in item.subItems"
-              :key="subItem"
-              @click="printSpaceId(item.subItemIds[subIndex])"
-            >
+            <li v-for="(subItem, subIndex) in item.subItems" :key="subItem"
+              @click="printSpaceId(item.subItemIds[subIndex])">
               {{ subItem }}
             </li>
           </ul>
@@ -57,28 +50,34 @@
     <button @click="showToast">Mostrar Toast</button>
 
     <!-- Toast de Bootstrap -->
-    <div
-      id="myToast"
-      class="toast"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-      data-autohide="false"
-    >
+    <div id="myToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false">
       <div class="toast-header">
         <strong class="mr-auto">Mensaje</strong>
-        <button
-          type="button"
-          class="ml-2 mb-1 close"
-          data-dismiss="toast"
-          aria-label="Cerrar"
-          @click="hideToast"
-        >
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Cerrar" @click="hideToast">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="toast-body">
         {{ conflictMessage }}
+      </div>
+    </div>
+  </div>
+
+  <button @click="initAskAI">
+    <p v-if="!showGPT">Consultar a la IA sobre el horario</p>
+    <p v-else>Cerrar</p>
+  </button>
+  <div v-if="showGPT">
+    <div v-if="loadingGPT" class="card"> <!-- Show spinner while loading -->
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <div v-else class="card">
+
+      <div class="card-body">
+        <h5 class="card-title"> <img src="/src/assets/chatgptlogo.png" alt="Card image"> dice:</h5>
+        {{ recommendationGPT }}
       </div>
     </div>
   </div>
@@ -88,6 +87,7 @@
 import { Toast } from "bootstrap";
 import { defineComponent, onMounted, ref } from "vue";
 import { fetchSpaces } from "../services/SpaceService";
+import { fetchAskAI } from "../services/AskAIService";
 import {
   fetchPlanifications,
   planificationEventTarget,
@@ -128,6 +128,10 @@ interface Space {
 export default defineComponent({
   name: "CalendarView",
   setup() {
+    const showGPT = ref(false);
+    const loadingGPT = ref(false);
+    const recommendationGPT = ref("");
+    const selectedSpaceId = ref(-1);
     const conflictMessage = ref("No hay conflictos");
     const days = ref(["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]);
     const timeSlots = ref([
@@ -209,6 +213,7 @@ export default defineComponent({
     };
 
     const loadCalendarPlanifications = async (spaceId: number) => {
+      selectedSpaceId.value = spaceId;
       clearCalendar();
       const daysonweek = ["MON", "TUE", "WED", "THU", "FRI"];
       const daysonweekspanish = [
@@ -422,7 +427,35 @@ export default defineComponent({
         toast.hide();
       }
     }
+
+    // Iniciar consulta a AI al presionar el botón
+    const initAskAI = () => {
+      if (!showGPT.value) {
+        if (selectedSpaceId.value > -1) {
+          showGPT.value = true;
+          askAI(selectedSpaceId.value);
+        }
+      } else {
+        showGPT.value = false;
+      }
+    };
+
+    // Consulta de horarios a GPT
+    const askAI = async (spaceId: number) => {
+      loadingGPT.value = true;
+      const response = await fetchAskAI(spaceId);
+      if (response && response.data) {
+        recommendationGPT.value = response.data;
+        showGPT.value = true;
+      }
+      loadingGPT.value = false;
+    };
+
     return {
+      showGPT,
+      loadingGPT,
+      recommendationGPT,
+      initAskAI,
       days,
       timeSlots,
       schedule,
