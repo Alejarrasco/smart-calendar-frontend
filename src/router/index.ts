@@ -1,12 +1,15 @@
 import {
   createRouter as createVueRouter,
-  createWebHistory, // Importar createWebHistory en lugar de createWebHashHistory
+  createWebHistory,
   Router,
   RouteRecordRaw,
+  NavigationGuardNext,
+  RouteLocationNormalized,
 } from "vue-router";
 import Home from "../views/Home.vue";
 import Profile from "../views/Profile.vue";
 import { createAuthGuard } from "@auth0/auth0-vue";
+import { useAuth0 } from "@auth0/auth0-vue";
 import { App } from "vue";
 import CalendarView from "../views/CalendarView.vue";
 import SpaceForm from "../views/SpaceForm.vue";
@@ -62,13 +65,33 @@ const routes: Array<RouteRecordRaw> = [
     path: "/solicitudeView",
     name: "solicitudeView",
     component: SolicitudeView,
-  }
+  },
   // ... aquí irían el resto de tus rutas
 ];
 
 export function createRouter(app: App): Router {
-  return createVueRouter({
-    history: createWebHistory(), // Cambiado a createWebHistory para usar el modo history
-    routes, // Rutas definidas arriba
+  const router = createVueRouter({
+    history: createWebHistory(),
+    routes,
   });
+
+  router.beforeEach(
+    (
+      to: RouteLocationNormalized,
+      from: RouteLocationNormalized,
+      next: NavigationGuardNext
+    ) => {
+      const { isAuthenticated } = useAuth0();
+
+      if (!isAuthenticated.value && to.name !== "home") {
+        // Si el usuario no está autenticado y no está intentando acceder a 'home', redirige a 'home'
+        next({ name: "home" });
+      } else {
+        // Si está autenticado o está accediendo a 'home', permite la navegación
+        next();
+      }
+    }
+  );
+
+  return router;
 }
