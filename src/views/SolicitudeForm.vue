@@ -4,18 +4,29 @@
     <div class="form-group">
       <label for="space">Espacio/Laboratorio:</label>
       <select id="space" class="form-dropdown" v-model="reservation.space">
-        <option v-for="space in spaces" :value="space">{{ space }}</option>
+        <option value=0 disabled>Seleccione un espacio</option>
+        <option v-for="space in spaces" :value="space">{{ space.name }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="subject">Asignatura:</label>
+      <select id="subject" class="form-dropdown" v-model="reservation.subject">
+        <option value="" disabled>Seleccione una asignatura</option>
+        <option v-for="subject in allSubjects" :value="subject.code">
+          {{ subject.name }}
+        </option>
       </select>
     </div>
 
     <div class="form-group">
       <label for="responsible">Responsable:</label>
-      <input
-        type="text"
-        id="responsible"
-        class="form-input"
-        v-model="reservation.responsible"
-      />
+      <select id="responsible" class="form-dropdown" v-model="reservation.responsible">
+        <option value=0 disabled>Seleccione un responsable</option>
+        <option v-for="responsible in subjectResponsibles" :value="responsible">
+          {{ responsible.name }}
+        </option>
+      </select>
     </div>
 
     <div class="form-group">
@@ -25,19 +36,10 @@
       </select>
     </div>
 
-    <div class="form-group">
-      <label for="subject">Asignatura:</label>
-      <select id="subject" class="form-dropdown" v-model="reservation.subject">
-        <option v-for="subject in filteredSubjects" :value="subject">
-          {{ subject }}
-        </option>
-      </select>
-    </div>
-
     <!-- Checkbox para determinar si el horario es recurrente -->
     <div class="form-group">
-      <label for="recurring">Horario Recurrente:</label>
-      <input type="checkbox" id="recurring" v-model="reservation.isRecurring" />
+      <label for="recurring">Horario Recurrente:  </label>
+      <input type="checkbox" id="recurring" v-model="reservation.isRecurring" disabled/>
     </div>
 
     <!-- Configuración de horarios recurrentes -->
@@ -48,16 +50,8 @@
 
         <!-- Horarios para el día seleccionado -->
         <div v-if="day.checked" class="time-slots">
-          <div
-            v-for="timeSlot in day.timeSlots"
-            :key="timeSlot.label"
-            class="time-slot"
-          >
-            <input
-              type="checkbox"
-              v-model="timeSlot.checked"
-              :id="timeSlot.label"
-            />
+          <div v-for="timeSlot in day.timeSlots" :key="timeSlot.label" class="time-slot">
+            <input type="checkbox" v-model="timeSlot.checked" :id="timeSlot.label" />
             <label :for="timeSlot.label">{{ timeSlot.label }}</label>
           </div>
         </div>
@@ -83,7 +77,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, watch } from "vue";
+import { fetchSpaces } from "../services/SpaceService";
+import { fetchSubjects } from "../services/SubjectService";
+import { fetchPersonById } from "../services/PersonService";
 
 interface TimeSlot {
   label: string;
@@ -103,12 +100,34 @@ interface NonRecurringSchedule {
 }
 
 interface Reservation {
-  space: string;
-  responsible: string;
+  space: number;
+  responsible: number;
   role: string;
   subject: string;
   isRecurring: boolean;
+  startDate: string;
+  endDate: string;
+  periods: number[];
 }
+
+
+type Subject = {
+  id: number;
+  name: string;
+  code: string;
+  responsibleIds: number[];
+};
+
+type Space = {
+  id: number;
+  name: string;
+  type: string;
+};
+
+type Responsible = {
+  id: number;
+  name: string;
+};
 
 export default defineComponent({
   name: "ReservationForm",
@@ -151,30 +170,91 @@ export default defineComponent({
       // ...
     ]);
     const reservation = reactive<Reservation>({
-      space: "",
-      responsible: "",
-      role: "",
       subject: "",
-      isRecurring: false,
+      space: 0,
+      responsible: 0,
+      role: "",
+      startDate: "2023-06-01",
+      endDate: "2023-12-10",
+      isRecurring: true,
+      periods: [],
     });
     const nonRecurringSchedule = reactive<NonRecurringSchedule>({
       date: "",
       start: "",
       end: "",
     });
-    const allSubjects = [
-      "Química Industrial",
-      "Química Orgánica I",
-      "Química Orgánica II",
-    ]; // Suponiendo que son las asignaturas disponibles
-    const filteredSubjects = reactive<string[]>([]);
-    const spaces = [
-      "Laboratorio 7 - Química Industrial",
-      "Laboratorio 8 - Física Avanzada",
-    ]; // Ejemplo de espacios disponibles
+    const allSubjects = reactive<Subject[]>([]);
+    const subjectResponsibles = reactive<Responsible[]>([]);
+    //const filteredSubjects = reactive<string[]>([]);
+    const spaces = reactive<Space[]>([]);
     const roles = ["Docente", "Investigador"]; // Ejemplo de roles
 
-    // Observar cambios en el responsable para filtrar las asignaturas
+    // Cargar los espacios
+    fetchSpaces().then((fetchedSpaces) => {
+      for (let space of fetchedSpaces.data.AUDITORIUM) {
+        spaces.push({
+          id: space.spaceId,
+          name: space.spaceName,
+          type: space.spaceType,
+        });
+      }
+      for (let space of fetchedSpaces.data.LABORATORY) {
+        spaces.push({
+          id: space.spaceId,
+          name: space.spaceName,
+          type: space.spaceType,
+        });
+      }
+      for (let space of fetchedSpaces.data.CLASSROOM) {
+        spaces.push({
+          id: space.spaceId,
+          name: space.spaceName,
+          type: space.spaceType,
+        });
+      }
+    });
+
+    // Cargar las asignaturas
+    const fetchAllSubjects = async () => {
+      const subjects = await fetchSubjects(null);
+      for (let subject of subjects) {
+        allSubjects.push({
+          id: subject.subjectId,
+          name: subject.subjectName,
+          code: subject.subjectCode,
+          responsibleIds: subject.responsiblesIds,
+        });
+      }
+    };
+
+    // Cargar los responsables
+    const updateResponsibles = async () => {
+      subjectResponsibles.splice(0, subjectResponsibles.length);
+      for (let subject of allSubjects) {
+        //console.log(subject.code);
+        //console.log(reservation.subject);
+        if (subject.code == reservation.subject) {
+          for (let id of subject.responsibleIds) {
+            fetchPersonById(id).then((person) => {
+              subjectResponsibles.push({
+                id: person.personId,
+                name: person.firstName + " " + person.lastName,
+              });
+            });
+          }
+        }
+      }
+    };
+
+    // Observar cambios en las asignaturas para filtrar los responsables
+    watch(() => reservation.subject, (newSubject) => {
+      updateResponsibles();
+    });
+      
+
+    fetchAllSubjects();
+
 
     function addNonRecurringTimeSlot() {
       // Implementar lógica para añadir horarios no recurrentes
@@ -191,7 +271,9 @@ export default defineComponent({
     return {
       reservation,
       weekSchedule,
-      filteredSubjects,
+      allSubjects,
+      subjectResponsibles,
+      updateResponsibles,
       spaces,
       nonRecurringSchedule,
       roles,
