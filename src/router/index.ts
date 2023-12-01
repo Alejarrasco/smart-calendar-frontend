@@ -30,7 +30,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/calendarView",
-    name: "calendar",
+    name: "calendarView",
     component: CalendarView,
   },
   {
