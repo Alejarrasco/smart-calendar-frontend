@@ -86,7 +86,7 @@ export default defineComponent({
         }
         subject.responsiblesFullNames = responsiblesNames;
       };
-      console.log("Materias:", this.subjects);
+      console.log("Materias:", this.subjects[0].responsiblesFullNames.join(", "));
     });
 
   },
