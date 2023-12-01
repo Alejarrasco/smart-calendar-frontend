@@ -7,6 +7,21 @@
     <div class="calendar-body">
       <div class="calendar-sidebar">
         <!-- Aquí empieza el acordeón -->
+
+        <div>
+          <button class="button-accordion-style">
+            <router-link to="/spaceForm" class="nav-link"
+              >Crear Espacio</router-link
+            >
+          </button>
+          <br />
+          <button class="button-accordion-style">
+            <router-link to="/solicitudeForm" class="nav-link"
+              >Crear Solicitud</router-link
+            >
+          </button>
+        </div>
+        <br />
         <div
           v-for="(item, index) in accordionItems"
           :key="item.title"
@@ -27,34 +42,55 @@
         </div>
       </div>
       <div class="calendar-schedule">
-        <!-- Tabla del calendario aquí -->
-        <table>
-          <thead>
-            <tr>
-              <th v-for="day in days" :key="day">{{ day }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="timeSlot in timeSlots" :key="timeSlot">
-              <td v-for="day in days" :key="day">
-                <div v-if="getSession(day, timeSlot)" class="session-card">
-                  <h3>{{ getSession(day, timeSlot)?.subject }}</h3>
-                  <p>
-                    {{ getSession(day, timeSlot)?.start_time }} -
-                    {{ getSession(day, timeSlot)?.end_time }}
-                  </p>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- Verificar si se ha seleccionado un espacio -->
+        <div v-if="!selectedSpace" class="empty-calendar-message">
+          <!-- Mensaje para cuando no se ha seleccionado ningún espacio -->
+          <p>Haga clic en algún espacio</p>
+        </div>
+        <div v-else>
+          <!-- Tabla del calendario, que se muestra solo si se seleccionó un espacio -->
+          <table>
+            <thead>
+              <tr>
+                <!-- Encabezado de la tabla con los días de la semana -->
+                <th v-for="day in days" :key="day">{{ day }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Bucle para cada franja horaria -->
+              <tr v-for="timeSlot in timeSlots" :key="timeSlot">
+                <!-- Bucle para cada día de la semana -->
+                <td v-for="day in days" :key="day">
+                  <!-- Verifica si hay una sesión programada para esa franja horaria en ese día -->
+                  <div
+                    v-if="getSession(day, timeSlot)"
+                    :class="{
+                      'session-card': true,
+                      'pending-session':
+                        getSession(day, timeSlot)?.solicitude_status ===
+                        'PENDING',
+                      'empty-session':
+                        getSession(day, timeSlot)?.subject === 'vacio',
+                    }"
+                  >
+                    <h3>{{ getSession(day, timeSlot)?.subject }}</h3>
+                    <p>
+                      {{ getSession(day, timeSlot)?.start_time }} -
+                      {{ getSession(day, timeSlot)?.end_time }}
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
   <div>
     <!-- Botón para mostrar el toast -->
-    <button @click="showToast">Mostrar Toast</button>
+    <button class="blue-button" @click="showToast">¿Choques?</button>
 
     <!-- Toast de Bootstrap -->
     <div
@@ -78,7 +114,7 @@
         </button>
       </div>
       <div class="toast-body">
-        {{ conflictMessage }}
+        <span class="toast-message">{{ conflictMessage }}</span>
       </div>
     </div>
   </div>
@@ -129,6 +165,7 @@ export default defineComponent({
   name: "CalendarView",
   setup() {
     const conflictMessage = ref("No hay conflictos");
+    const selectedSpace = ref(false); // Nueva referencia para controlar si se ha seleccionado un espacio
     const days = ref(["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]);
     const timeSlots = ref([
       "08:00:00",
@@ -159,13 +196,14 @@ export default defineComponent({
       });
     };
 
-    const printSpaceId = (spaceId: number) => {
-      loadCalendarPlanifications(spaceId);
-    };
-
     const getSession = (day: string, timeSlot: string): Session | null => {
       const daySchedule = schedule.value[day];
       return daySchedule ? daySchedule[timeSlot] || null : null;
+    };
+
+    const printSpaceId = (spaceId: number) => {
+      selectedSpace.value = true; // Cambia a verdadero cuando se selecciona un espacio
+      loadCalendarPlanifications(spaceId);
     };
 
     const loadSpaces = async () => {
@@ -434,6 +472,7 @@ export default defineComponent({
       conflictMessage,
       showToast,
       hideToast,
+      selectedSpace, // Asegúrate de devolver esto para que sea accesible en la plantilla
     };
   },
 });
@@ -441,6 +480,9 @@ export default defineComponent({
 
 <style scoped>
 .calendar-container {
+  width: 100%; /* Ajusta la anchura al 100% */
+  margin: 0; /* Elimina cualquier margen */
+  padding: 0; /* Elimina cualquier relleno */
   display: flex;
   flex-direction: column;
 }
@@ -459,6 +501,7 @@ export default defineComponent({
   flex: 1;
   background-color: #e9ecef;
   padding: 10px;
+  background-color: transparent; /* Configura el fondo como transparente */
 }
 
 .accordion-item {
@@ -530,5 +573,45 @@ th {
 .session-card p {
   margin: 4px 0;
   font-size: 0.9em;
+}
+
+.empty-calendar-message {
+  text-align: center; /* Centra el texto horizontalmente */
+  font-size: 20px; /* Ajusta el tamaño del texto */
+  margin-top: 50px; /* Añade un margen en la parte superior para centrarlo verticalmente */
+  color: #333; /* Color del texto, ajusta según tus preferencias */
+}
+
+.calendar-header {
+  background-color: transparent; /* Configura el fondo como transparente */
+  padding: 0; /* Elimina el relleno */
+  text-align: left; /* Alinea el texto a la izquierda */
+  /* Mantén aquí el resto de tus estilos para .calendar-header */
+}
+.toast-message {
+  font-size: 18px; /* Ajusta el tamaño de la fuente según tus preferencias */
+  /* Puedes agregar aquí otros estilos adicionales si lo necesitas */
+}
+.pending-session {
+  background-color: yellow; /* Fondo amarillo para sesiones pendientes */
+}
+
+.empty-session {
+  background-color: #f2f2f2; /* Fondo más opaco para sesiones vacías */
+}
+.button-accordion-style {
+  /* Suponiendo que este es el color de tus elementos de acordeón */
+  color: white;
+
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  outline: none;
+  transition: 0.4s;
+}
+.button-container {
+  display: flex; /* Alinea los elementos (botones) en línea */
+  justify-content: space-around; /* Distribuye el espacio alrededor de los elementos */
+  align-items: center; /* Alinea los elementos verticalmente en el centro */
 }
 </style>
