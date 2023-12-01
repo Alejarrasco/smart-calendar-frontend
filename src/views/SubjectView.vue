@@ -2,6 +2,12 @@
   <div class="admin-container">
     <section class="subjects-container">
       <h1>Asignaturas</h1>
+      <div class="add-subject-container">
+        <router-link to="/subjectForm" class="add-subject-link">
+          <button class="add-subject-button">Agregar Asignatura</button>
+        </router-link>
+      </div>
+      <br />
       <table class="subjects-table">
         <thead>
           <tr>
@@ -51,7 +57,6 @@ interface Subject {
 export default defineComponent({
   name: "SubjectsAdministration",
   setup() {
-
     const subjects = ref<Subject[]>([
       // Aquí iría la lista inicial de materias
     ]);
@@ -85,10 +90,9 @@ export default defineComponent({
           });
         }
         subject.responsiblesFullNames = responsiblesNames;
-      };
-      console.log("Materias:", this.subjects[0].responsiblesFullNames.join(", "));
+      }
+      console.log("Materias:", this.subjects);
     });
-
   },
 });
 </script>
@@ -130,4 +134,5 @@ export default defineComponent({
 
 .subjects-table button:hover {
   background-color: #dddddd;
-}</style>
+}
+</style>

@@ -24,37 +24,17 @@
             <template v-if="isAuthenticated">
               <li class="nav-item">
                 <router-link to="/calendarView" class="nav-link"
-                  >calendar</router-link
-                >
-              </li>
-              <li class="nav-item">
-                <router-link to="/spaceForm" class="nav-link"
-                  >spaceForm</router-link
-                >
-              </li>
-              <li class="nav-item">
-                <router-link to="/subjectForm" class="nav-link"
-                  >subjectForm</router-link
-                >
-              </li>
-              <li class="nav-item">
-                <router-link to="/responsibleForm" class="nav-link"
-                  >responsibleForm</router-link
+                  >Calendario</router-link
                 >
               </li>
               <li class="nav-item">
                 <router-link to="/subjectView" class="nav-link"
-                  >subjectView</router-link
-                >
-              </li>
-              <li class="nav-item">
-                <router-link to="/solicitudeForm" class="nav-link"
-                  >solicitudeForm</router-link
+                  >Materias</router-link
                 >
               </li>
               <li class="nav-item">
                 <router-link to="/solicitudeView" class="nav-link"
-                  >solicitudeView</router-link
+                  >Solicitudes</router-link
                 >
               </li>
             </template>

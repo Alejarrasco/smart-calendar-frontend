@@ -88,9 +88,14 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn open-space-btn" @click="openNewSpace">Abrir Espacio</button>
+      <button type="button" class="btn open-space-btn" @click="openNewSpace">
+        Abrir Espacio
+      </button>
       <button type="button" class="btn close-space-btn">
         Clausurar Espacio
+      </button>
+      <button type="button" class="btn btn-cancel">
+        <router-link to="/calendarView">Cancelar</router-link>
       </button>
     </div>
   </div>
@@ -110,7 +115,7 @@ export default defineComponent({
   setup() {
     const laboratoryName = ref("");
     const laboratoryDescription = ref("");
-    const spaceTypes = ref(["Auditorio","Aula","Laboratorio"]);
+    const spaceTypes = ref(["Auditorio", "Aula", "Laboratorio"]);
     const selectedType = ref("");
     const capacity = ref(1);
     const availableDates = ref({ start: "", end: "" });
@@ -149,12 +154,11 @@ export default defineComponent({
 
       const response = await createSpace(newSpace);
       console.log(response);
-      if (response.code== "SPAC-0002") {
+      if (response.code == "SPAC-0002") {
         alert("Espacio creado exitosamente");
       } else {
         alert("Error al crear el espacio");
       }
-
     }
 
     return {
@@ -309,5 +313,10 @@ export default defineComponent({
   border-radius: 4px;
   /* Añadir si se desea un poco de espacio a la izquierda de la etiqueta */
   margin-left: 0.5em;
+}
+
+.btn-cancel {
+  background-color: #f44336;
+  color: white;
 }
 </style>

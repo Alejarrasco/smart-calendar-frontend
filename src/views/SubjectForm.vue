@@ -5,24 +5,43 @@
 
       <div class="form-group">
         <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" v-model="subject.nombre" class="form-control" />
+        <input
+          type="text"
+          id="nombre"
+          v-model="subject.nombre"
+          class="form-control"
+        />
       </div>
 
       <div class="form-group">
         <label for="descripcion">Descripción:</label>
-        <input type="text" id="descripcion" v-model="subject.descripcion" class="form-control" />
+        <input
+          type="text"
+          id="descripcion"
+          v-model="subject.descripcion"
+          class="form-control"
+        />
       </div>
 
       <div class="form-group">
         <label for="codigo">Código:</label>
-        <input type="text" id="codigo" v-model="subject.codigo" class="form-control" />
+        <input
+          type="text"
+          id="codigo"
+          v-model="subject.codigo"
+          class="form-control"
+        />
       </div>
 
       <div class="form-group">
         <label for="facultad">Facultad:</label>
         <select id="facultad" v-model="subject.facultad" class="form-control">
           <option value="" disabled>Seleccione una facultad</option>
-          <option v-for="(facultad, index) in facultades" :key="index" :value="facultad.name">
+          <option
+            v-for="(facultad, index) in facultades"
+            :key="index"
+            :value="facultad.name"
+          >
             {{ facultad.name }}
           </option>
         </select>
@@ -30,9 +49,17 @@
 
       <div class="form-group">
         <label for="responsable">Responsable:</label>
-        <select id="responsable" v-model="subject.responsables" class="form-control">
-          <option value=0 disabled>Seleccione un responsable</option>
-          <option v-for="(responsable, index) in responsables" :key="index" :value="responsable.person_id">
+        <select
+          id="responsable"
+          v-model="subject.responsables"
+          class="form-control"
+        >
+          <option value="0" disabled>Seleccione un responsable</option>
+          <option
+            v-for="(responsable, index) in responsables"
+            :key="index"
+            :value="responsable.person_id"
+          >
             {{ responsable.first_name }} {{ responsable.last_name }}
           </option>
         </select>
@@ -42,19 +69,39 @@
 
       <div class="form-group">
         <label for="periodosPorClase">Periodos por clase:</label>
-        <input type="number" id="periodosPorClase" v-model="subject.periodosPorClase" class="form-control" min="1" />
+        <input
+          type="number"
+          id="periodosPorClase"
+          v-model="subject.periodosPorClase"
+          class="form-control"
+          min="1"
+        />
       </div>
 
       <div class="form-group">
         <label for="clasesPorSemana">Clases por semana:</label>
-        <input type="number" id="clasesPorSemana" v-model="subject.clasesPorSemana" class="form-control" min="1" />
+        <input
+          type="number"
+          id="clasesPorSemana"
+          v-model="subject.clasesPorSemana"
+          class="form-control"
+          min="1"
+        />
       </div>
 
       <div class="form-group">
         <label for="tipoEspacio">Tipo de espacio:</label>
-        <select id="tipoEspacio" v-model="subject.tipoEspacio" class="form-control">
+        <select
+          id="tipoEspacio"
+          v-model="subject.tipoEspacio"
+          class="form-control"
+        >
           <option value="" disabled>Seleccione un tipo de espacio</option>
-          <option v-for="tipoEspacio in tiposEspacio" :key="tipoEspacio" :value="tipoEspacio">
+          <option
+            v-for="tipoEspacio in tiposEspacio"
+            :key="tipoEspacio"
+            :value="tipoEspacio"
+          >
             {{ tipoEspacio }}
           </option>
         </select>
@@ -62,7 +109,13 @@
 
       <div class="form-group">
         <label for="capacidad">Capacidad:</label>
-        <input type="number" id="capacidad" v-model="subject.capacidad" class="form-control" min="1" />
+        <input
+          type="number"
+          id="capacidad"
+          v-model="subject.capacidad"
+          class="form-control"
+          min="1"
+        />
       </div>
 
       <div class="form-group">
@@ -84,13 +137,18 @@
       <div class="form-group">
         <label for="preferencias">Preferencias:</label>
         <!-- Text área para las preferencias del docente -->
-        <textarea id="preferencias" v-model="subject.preferencias" class="form-control"></textarea>
+        <textarea
+          id="preferencias"
+          v-model="subject.preferencias"
+          class="form-control"
+        ></textarea>
       </div>
 
       <div class="form-actions">
-        <button type="button" @click="cancel" class="btn-cancel">
-          Cancelar
+        <button type="button" class="btn btn-cancel">
+          <router-link to="/calendarView">Cancelar</router-link>
         </button>
+
         <button type="submit" class="btn-create">Crear</button>
       </div>
     </form>
@@ -120,13 +178,13 @@ interface Subject {
 type Facultad = {
   id: number;
   name: string;
-}
+};
 
 type Responsable = {
   person_id: number;
   first_name: string;
   last_name: string;
-}
+};
 
 export default defineComponent({
   name: "SubjectCreationForm",
@@ -207,7 +265,7 @@ export default defineComponent({
       } else {
         //Show error message
       }
-    }
+    };
 
     function addRequirement() {
       if (requirement.value) {

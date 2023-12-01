@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <TestAuth />
     <!-- Banner Section -->
     <section class="banner">
       <img src="/src/assets/banner-image.png" alt="Smart Calendar" />
