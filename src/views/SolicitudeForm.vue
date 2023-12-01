@@ -43,12 +43,12 @@
     </div>
 
     <!-- Configuración de horarios recurrentes -->
-    <div v-if="reservation.isRecurring" class="recurring-schedule">
+    <!-- <div v-if="reservation.isRecurring" class="recurring-schedule">
       <div v-for="day in weekSchedule" :key="day.day" class="day-schedule">
         <input type="checkbox" v-model="day.checked" :id="day.day" />
         <label :for="day.day">{{ day.day }}</label>
 
-        <!-- Horarios para el día seleccionado -->
+         Horarios para el día seleccionado
         <div v-if="day.checked" class="time-slots">
           <div v-for="timeSlot in day.timeSlots" :key="timeSlot.label" class="time-slot">
             <input type="checkbox" v-model="timeSlot.checked" :id="timeSlot.label" />
@@ -56,8 +56,8 @@
           </div>
         </div>
       </div>
-    </div>
-    <div v-else class="schedule non-recurring-schedule">
+    </div> -->
+    <!-- <div v-else class="schedule non-recurring-schedule">
       <input type="date" v-model="nonRecurringSchedule.date" />
       <div class="time-slot">
         <input type="time" v-model="nonRecurringSchedule.start" />
@@ -66,7 +66,50 @@
       <button type="button" @click="addNonRecurringTimeSlot">
         Añadir Horario
       </button>
-    </div>
+    </div> -->
+
+    <!-- Period checktable -->
+    <div>
+    <table>
+      <tbody>
+        <tr>
+          <td>Lunes:</td>
+          <td v-for="period in timetable.MON" :key="period.periodId">
+            <input type="checkbox" :id="getCheckboxId('MON', period.periodId)" v-model="selectedPeriods" :value="period.periodId">
+            <label :for="getCheckboxId('MON', period.periodId)">{{ period.startTime }} </label>
+          </td>
+        </tr>
+        <tr>
+          <td>Martes:</td>
+          <td v-for="period in timetable.TUE" :key="period.periodId">
+            <input type="checkbox" :id="getCheckboxId('TUE', period.periodId)" v-model="selectedPeriods" :value="period.periodId">
+            <label :for="getCheckboxId('TUE', period.periodId)">{{ period.startTime }} </label>
+          </td>
+        </tr>
+        <tr>
+          <td>Miércoles:</td>
+          <td v-for="period in timetable.WED" :key="period.periodId">
+            <input type="checkbox" :id="getCheckboxId('WED', period.periodId)" v-model="selectedPeriods" :value="period.periodId">
+            <label :for="getCheckboxId('WED', period.periodId)">{{ period.startTime }} </label>
+          </td>
+        </tr>
+        <tr>
+          <td>Jueves:</td>
+          <td v-for="period in timetable.THU" :key="period.periodId">
+            <input type="checkbox" :id="getCheckboxId('THU', period.periodId)" v-model="selectedPeriods" :value="period.periodId">
+            <label :for="getCheckboxId('THU', period.periodId)">{{ period.startTime }} </label>
+          </td>
+        </tr>
+        <tr>
+          <td>Viernes:</td>
+          <td v-for="period in timetable.FRI" :key="period.periodId">
+            <input type="checkbox" :id="getCheckboxId('FRI', period.periodId)" v-model="selectedPeriods" :value="period.periodId">
+            <label :for="getCheckboxId('FRI', period.periodId)">{{ period.startTime }} </label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
     <!-- Botones de acción del formulario -->
     <div class="form-actions">
@@ -81,6 +124,8 @@ import { defineComponent, reactive, watch } from "vue";
 import { fetchSpaces } from "../services/SpaceService";
 import { fetchSubjects } from "../services/SubjectService";
 import { fetchPersonById } from "../services/PersonService";
+import { fetchPeriodsInSpace } from "../services/PeriodService";
+import { createSolicitude } from "../services/SolicitudeService";
 
 interface TimeSlot {
   label: string;
@@ -129,46 +174,16 @@ type Responsible = {
   name: string;
 };
 
+type period = {
+  startTime: string;
+  endTime: string;
+  weekday: string;
+  periodId: number;
+};
+
 export default defineComponent({
   name: "ReservationForm",
   setup() {
-    const weekSchedule = reactive<DaySchedule[]>([
-      {
-        day: "Lun",
-        checked: false,
-        timeSlots: [
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-        ],
-      },
-      {
-        day: "Lun",
-        checked: false,
-        timeSlots: [
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-        ],
-      },
-      {
-        day: "Lun",
-        checked: false,
-        timeSlots: [
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-          { label: "08:00-08:30", checked: false } /* Más horarios */,
-        ],
-      },
-      // Repite para cada día de la semana
-      // ...
-    ]);
     const reservation = reactive<Reservation>({
       subject: "",
       space: 0,
@@ -189,6 +204,17 @@ export default defineComponent({
     //const filteredSubjects = reactive<string[]>([]);
     const spaces = reactive<Space[]>([]);
     const roles = ["Docente", "Investigador"]; // Ejemplo de roles
+    const selectedPeriods = reactive<number[]>([]);
+    const timetable = reactive<Record<string, period[]>> ({
+      MON: [],
+      TUE: [],
+      WED: [],
+      THU: [],
+      FRI: [],
+      SAT: [],
+      SUN: [],
+    });
+        
 
     // Cargar los espacios
     fetchSpaces().then((fetchedSpaces) => {
@@ -251,6 +277,62 @@ export default defineComponent({
     watch(() => reservation.subject, (newSubject) => {
       updateResponsibles();
     });
+
+    // Obtener los timeslots de espacio seleccionado
+    const fetchSpacePeriods = async () => {
+      console.log(reservation.space.id);
+      const periods = await fetchPeriodsInSpace(reservation.space.id);
+      const weekdays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+      //clear all periods
+      for (let weekday of weekdays) {
+        timetable[weekday].splice(0, timetable[weekday].length);
+      }
+      for (let weekday of weekdays) {
+        for (let period of periods[weekday]) {
+          timetable[weekday].push({
+            startTime: period.startTime,
+            endTime: period.endTime,
+            weekday: weekday,
+            periodId: period.periodId,
+          });
+        }
+      }
+
+      console.log(timetable);
+    };
+
+    // Observar cambios en el espacio para actualizar los timeslots
+    watch(() => reservation.space, (newSpace) => {
+      fetchSpacePeriods();
+    });
+
+    // Guardar el periodId cuando se seleccione un checkbox
+    watch(() => selectedPeriods, (newPeriods) => {
+      reservation.periods.splice(0, reservation.periods.length);
+      for (let period of newPeriods) {
+        reservation.periods.push(period);
+      }
+      console.log(reservation.periods);
+    });
+
+    // Obtener el id del checkbox
+    const getCheckboxId = (day: string, periodId: any) => {
+      return `${day}-${periodId}`;
+    };
+
+    // Guardar todos los values the los checkboxes seleccionados manualmente
+    const getcheckbox = () => {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+      selectedPeriods.splice(0, selectedPeriods.length);
+      checkboxes.forEach((checkbox) => {
+        selectedPeriods.push(parseInt(checkbox.value));
+      });
+
+      //remove the first element
+      selectedPeriods.shift();
+
+      console.log(selectedPeriods);
+    };
       
 
     fetchAllSubjects();
@@ -265,12 +347,35 @@ export default defineComponent({
     }
 
     function saveReservation() {
+      console.log(reservation);
+
+      getcheckbox();
       // Implementar lógica para guardar la reserva
+      const reservationData = {
+        subjectCode: reservation.subject,
+        personId: reservation.responsible.id,
+        recurrent: true,
+        startDate: "2023-06-01",
+        endDate: "2023-12-24", //FIXME: Cambiar a la fecha actual
+        periods: selectedPeriods,
+        spaceId: reservation.space.id
+      };
+      console.log(reservationData);
+
+      createSolicitude(reservationData).then((response) => {
+        console.log(response);
+        if (response.data) {
+          alert("Solicitud creada exitosamente");
+        } else {
+          alert("Error al crear la solicitud");
+        }
+      });
+
     }
 
     return {
       reservation,
-      weekSchedule,
+      //weekSchedule,
       allSubjects,
       subjectResponsibles,
       updateResponsibles,
@@ -280,6 +385,9 @@ export default defineComponent({
       addNonRecurringTimeSlot,
       cancelReservation,
       saveReservation,
+      selectedPeriods,
+      timetable,
+      getCheckboxId,
     };
   },
 });
